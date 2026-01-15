@@ -51,6 +51,22 @@ const ElementIcon = ({ type }: { type: string }) => {
           <line x1="18" y1="6" x2="6" y2="18" />
         </svg>
       );
+    case 'dots':
+      return (
+        <svg {...iconProps}>
+          <circle cx="8" cy="8" r="2" fill="currentColor" stroke="none" />
+          <circle cx="16" cy="8" r="2" fill="currentColor" stroke="none" />
+          <circle cx="12" cy="16" r="2" fill="currentColor" stroke="none" />
+          <line x1="8" y1="8" x2="16" y2="8" strokeWidth="1" />
+          <line x1="16" y1="8" x2="12" y2="16" strokeWidth="1" />
+        </svg>
+      );
+    case 'wavy-line':
+      return (
+        <svg {...iconProps}>
+          <path d="M4 12 Q8 6, 12 12 Q16 18, 20 12" />
+        </svg>
+      );
     default:
       return (
         <svg {...iconProps}>
