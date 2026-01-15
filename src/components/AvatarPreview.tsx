@@ -1,21 +1,22 @@
 import { useEffect, useState } from "react";
-import { generateAvatarDataURL } from "@/lib/avatarGenerator";
+import { generateAvatarDataURL, BackgroundType } from "@/lib/avatarGenerator";
 
 interface AvatarPreviewProps {
   email: string;
   size?: number;
   className?: string;
+  background?: BackgroundType;
 }
 
-export const AvatarPreview = ({ email, size = 256, className = "" }: AvatarPreviewProps) => {
+export const AvatarPreview = ({ email, size = 256, className = "", background = 'cosmos' }: AvatarPreviewProps) => {
   const [avatarUrl, setAvatarUrl] = useState<string>("");
   
   useEffect(() => {
     if (email) {
-      const url = generateAvatarDataURL(email, size);
+      const url = generateAvatarDataURL(email, size, background);
       setAvatarUrl(url);
     }
-  }, [email, size]);
+  }, [email, size, background]);
   
   if (!email || !avatarUrl) {
     return (

@@ -5,6 +5,61 @@ interface CharacterBreakdownProps {
   email: string;
 }
 
+// Mini SVG icons for each element type
+const ElementIcon = ({ type }: { type: string }) => {
+  const iconProps = { 
+    className: "w-6 h-6", 
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: 2,
+    strokeLinecap: "round" as const,
+    strokeLinejoin: "round" as const
+  };
+
+  switch (type) {
+    case 'line-circle':
+      return (
+        <svg {...iconProps}>
+          <circle cx="12" cy="12" r="8" />
+        </svg>
+      );
+    case 'concentric':
+      return (
+        <svg {...iconProps}>
+          <circle cx="12" cy="12" r="9" />
+          <circle cx="12" cy="12" r="5" />
+          <circle cx="12" cy="12" r="2" />
+        </svg>
+      );
+    case 'spiral':
+      return (
+        <svg {...iconProps}>
+          <path d="M12 12 C12 8, 16 8, 16 12 C16 18, 6 18, 6 12 C6 4, 20 4, 20 12" />
+        </svg>
+      );
+    case 'triangle':
+      return (
+        <svg {...iconProps}>
+          <polygon points="12,4 20,18 4,18" fill="none" />
+        </svg>
+      );
+    case 'cross':
+      return (
+        <svg {...iconProps}>
+          <line x1="6" y1="6" x2="18" y2="18" />
+          <line x1="18" y1="6" x2="6" y2="18" />
+        </svg>
+      );
+    default:
+      return (
+        <svg {...iconProps}>
+          <circle cx="12" cy="12" r="8" />
+        </svg>
+      );
+  }
+};
+
 export const CharacterBreakdown = ({ email }: CharacterBreakdownProps) => {
   const elements = processEmail(email);
   
@@ -22,14 +77,13 @@ export const CharacterBreakdown = ({ email }: CharacterBreakdownProps) => {
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: index * 0.03 }}
-            className="flex flex-col items-center gap-1 p-2 bg-card/50 rounded-lg border border-border/50"
+            className="flex flex-col items-center gap-1 p-2 bg-muted rounded-lg border border-border/50"
           >
             <span className="font-mono text-xs text-muted-foreground">{element.char}</span>
-            <div
-              className="w-6 h-6 rounded"
-              style={{ backgroundColor: element.color }}
-            />
-            <span className="text-[10px] text-muted-foreground capitalize">{element.shape}</span>
+            <div className="w-6 h-6 text-foreground flex items-center justify-center">
+              <ElementIcon type={element.shape} />
+            </div>
+            <span className="text-[10px] text-muted-foreground capitalize">{element.shape.replace('-', ' ')}</span>
           </motion.div>
         ))}
         {elements.length > 20 && (
