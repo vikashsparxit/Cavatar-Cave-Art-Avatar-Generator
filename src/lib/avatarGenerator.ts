@@ -487,7 +487,8 @@ export function generateAvatarCanvas(email: string, size: number = 256, backgrou
     const textX = size / 2;
     const textY = size / 2 + size * 0.02;
     const fontSize = size * 0.85;
-    const lineSpacing = Math.max(4, size * 0.035);
+    // Denser lines for smaller sizes, sparser for larger
+    const lineSpacing = Math.max(3, size * 0.025);
     const diagonal = size * 1.5;
     
     // Step 1: Create a mask canvas with the letter shape
@@ -507,9 +508,9 @@ export function generateAvatarCanvas(email: string, size: number = 256, backgrou
     crosshatchCanvas.height = size;
     const crossCtx = crosshatchCanvas.getContext('2d')!;
     
-    // Draw crosshatch lines
+    // Draw crosshatch lines - thicker for small sizes
     crossCtx.strokeStyle = lineColor;
-    crossCtx.lineWidth = Math.max(1, size * 0.008);
+    crossCtx.lineWidth = Math.max(1.5, size * 0.012);
     crossCtx.lineCap = 'round';
     
     // Diagonal lines from top-left to bottom-right
@@ -532,9 +533,9 @@ export function generateAvatarCanvas(email: string, size: number = 256, backgrou
     crossCtx.globalCompositeOperation = 'destination-in';
     crossCtx.drawImage(maskCanvas, 0, 0);
     
-    // Step 4: Draw filled letter base (subtle)
+    // Step 4: Draw filled letter base (stronger for visibility)
     ctx.save();
-    ctx.globalAlpha = 0.08;
+    ctx.globalAlpha = 0.12;
     ctx.fillStyle = lineColor;
     ctx.font = `bold ${fontSize}px Arial, sans-serif`;
     ctx.textAlign = 'center';
@@ -542,17 +543,17 @@ export function generateAvatarCanvas(email: string, size: number = 256, backgrou
     ctx.fillText(firstLetter, textX, textY);
     ctx.restore();
     
-    // Step 5: Draw the masked crosshatch onto main canvas
+    // Step 5: Draw the masked crosshatch onto main canvas (higher opacity)
     ctx.save();
-    ctx.globalAlpha = 0.2;
+    ctx.globalAlpha = 0.28;
     ctx.drawImage(crosshatchCanvas, 0, 0);
     ctx.restore();
     
-    // Step 6: Stroke/border for definition
+    // Step 6: Stroke/border for definition (stronger)
     ctx.save();
-    ctx.globalAlpha = 0.15;
+    ctx.globalAlpha = 0.2;
     ctx.strokeStyle = lineColor;
-    ctx.lineWidth = size * 0.012;
+    ctx.lineWidth = Math.max(1.5, size * 0.015);
     ctx.font = `bold ${fontSize}px Arial, sans-serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
