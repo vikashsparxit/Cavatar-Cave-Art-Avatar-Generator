@@ -417,18 +417,36 @@ export function generateAvatarCanvas(email: string, size: number = 256): HTMLCan
   const ctx = canvas.getContext('2d')!;
   
   const hash = hashString(email);
+  const bgRand = seededRandom(hash + 999);
   
-  // Light gradient background - white center fading to soft cream/gray edges
+  // Dark cosmos background with subtle gradient
   const bgGradient = ctx.createRadialGradient(
-    size * 0.4, size * 0.4, 0,
-    size / 2, size / 2, size * 0.85
+    size * 0.3, size * 0.3, 0,
+    size / 2, size / 2, size * 0.9
   );
-  bgGradient.addColorStop(0, '#FFFFFF');
-  bgGradient.addColorStop(0.5, '#FAFAFA');
-  bgGradient.addColorStop(0.8, '#F0F0F0');
-  bgGradient.addColorStop(1, '#E8E8E8');
+  bgGradient.addColorStop(0, '#1a1a2e');
+  bgGradient.addColorStop(0.4, '#16213e');
+  bgGradient.addColorStop(0.7, '#0f0f23');
+  bgGradient.addColorStop(1, '#0a0a15');
   ctx.fillStyle = bgGradient;
   ctx.fillRect(0, 0, size, size);
+  
+  // Add subtle background stars
+  const numBgStars = 30 + Math.floor(bgRand() * 20);
+  for (let i = 0; i < numBgStars; i++) {
+    const starX = bgRand() * size;
+    const starY = bgRand() * size;
+    const starSize = 0.5 + bgRand() * 1.5;
+    const starOpacity = 0.2 + bgRand() * 0.4;
+    
+    ctx.save();
+    ctx.globalAlpha = starOpacity;
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.arc(starX, starY, starSize, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
   
   // Generate and draw layers
   const layers = generateLayers(email, size);
@@ -483,13 +501,25 @@ export function generateAvatarSVG(email: string, size: number = 256): string {
       </radialGradient>`;
   }
   
+  // Generate background stars for SVG
+  let bgStars = '';
+  const svgRand = seededRandom(hashString(email) + 999);
+  const numSvgStars = 30 + Math.floor(svgRand() * 20);
+  for (let i = 0; i < numSvgStars; i++) {
+    const starX = svgRand() * size;
+    const starY = svgRand() * size;
+    const starSize = 0.5 + svgRand() * 1.5;
+    const starOpacity = 0.2 + svgRand() * 0.4;
+    bgStars += `<circle cx="${starX}" cy="${starY}" r="${starSize}" fill="#ffffff" opacity="${starOpacity}"/>`;
+  }
+  
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
     <defs>
-      <radialGradient id="bgGrad" cx="40%" cy="40%">
-        <stop offset="0%" style="stop-color:#FFFFFF"/>
-        <stop offset="50%" style="stop-color:#FAFAFA"/>
-        <stop offset="80%" style="stop-color:#F0F0F0"/>
-        <stop offset="100%" style="stop-color:#E8E8E8"/>
+      <radialGradient id="bgGrad" cx="30%" cy="30%">
+        <stop offset="0%" style="stop-color:#1a1a2e"/>
+        <stop offset="40%" style="stop-color:#16213e"/>
+        <stop offset="70%" style="stop-color:#0f0f23"/>
+        <stop offset="100%" style="stop-color:#0a0a15"/>
       </radialGradient>
       ${gradientDefs}
       <clipPath id="rounded">
@@ -497,11 +527,12 @@ export function generateAvatarSVG(email: string, size: number = 256): string {
       </clipPath>
       <radialGradient id="vignette" cx="50%" cy="50%">
         <stop offset="15%" style="stop-color:transparent"/>
-        <stop offset="100%" style="stop-color:rgba(0,0,0,0.6)"/>
+        <stop offset="100%" style="stop-color:rgba(0,0,0,0.3)"/>
       </radialGradient>
     </defs>
     <g clip-path="url(#rounded)">
       <rect width="${size}" height="${size}" fill="url(#bgGrad)"/>
+      ${bgStars}
       ${shapes}
       <rect width="${size}" height="${size}" fill="url(#vignette)"/>
     </g>
