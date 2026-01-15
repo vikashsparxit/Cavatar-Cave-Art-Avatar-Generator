@@ -3,6 +3,7 @@
 export type BackgroundType = 'cosmos' | 'white' | string;
 export type AvatarShape = 'rounded' | 'circle';
 export type ImageFormat = 'png' | 'webp' | 'jpeg';
+type DetailLevel = 'full' | 'medium' | 'minimal';
 
 // Extract first alphabetic character from email for silhouette
 function getFirstLetter(email: string): string {
@@ -45,6 +46,27 @@ function getLineColor(background: BackgroundType): string {
   return '#ffffff';
 }
 
+// Size-adaptive detail level system
+function getDetailLevel(size: number): DetailLevel {
+  if (size >= 128) return 'full';
+  if (size >= 64) return 'medium';
+  return 'minimal';
+}
+
+// Get adaptive stroke width based on size
+function getMinStrokeWidth(size: number): number {
+  if (size < 64) return 2.5;
+  if (size < 128) return 2;
+  return 1.5;
+}
+
+// Get spread factor to push shapes apart at smaller sizes
+function getSpreadFactor(size: number): number {
+  if (size < 64) return 1.4;
+  if (size < 128) return 1.2;
+  return 1.0;
+}
+
 interface LayerElement {
   type: 'line-circle' | 'concentric' | 'spiral' | 'triangle' | 'cross' | 'dots' | 'wavy-line' | 'connection';
   x: number;
@@ -62,48 +84,65 @@ function generateLayers(email: string, size: number): LayerElement[] {
   const chars = email.toUpperCase().replace(/[^A-Z0-9@._\-+]/g, '').split('');
   const layers: LayerElement[] = [];
   const center = size / 2;
+  const detailLevel = getDetailLevel(size);
+  const minStroke = getMinStrokeWidth(size);
+  const spread = getSpreadFactor(size);
   
   const cornerAngles = [Math.PI * 0.25, Math.PI * 0.75, Math.PI * 1.25, Math.PI * 1.75];
   
+  // Detail level counts for each shape type
+  const counts = {
+    concentric: detailLevel === 'full' ? 4 : detailLevel === 'medium' ? 2 : 1,
+    lineCircles: detailLevel === 'full' ? (3 + Math.floor(rand() * 2)) : detailLevel === 'medium' ? 2 : 1,
+    spirals: detailLevel === 'full' ? (1 + Math.floor(rand() * 2)) : detailLevel === 'medium' ? 1 : 0,
+    triangles: detailLevel === 'full' ? (2 + Math.floor(rand() * 2)) : detailLevel === 'medium' ? 2 : 1,
+    crosses: detailLevel === 'full' ? (3 + Math.floor(rand() * 3)) : detailLevel === 'medium' ? 2 : 1,
+    dots: detailLevel === 'full' ? (2 + Math.floor(rand() * 2)) : detailLevel === 'medium' ? 1 : 0,
+    wavyLines: detailLevel === 'full' ? (2 + Math.floor(rand() * 2)) : detailLevel === 'medium' ? 1 : 0,
+    connections: detailLevel === 'full' ? (4 + Math.floor(rand() * 3)) : detailLevel === 'medium' ? 2 : 0,
+  };
+  
   // ===== ZONE 1: CORNER CONCENTRIC CIRCLES =====
-  for (let i = 0; i < 4; i++) {
-    const angle = cornerAngles[i] + (rand() - 0.5) * 0.3;
-    const distance = size * 0.32 + rand() * size * 0.08;
+  for (let i = 0; i < counts.concentric; i++) {
+    const angle = cornerAngles[i % 4] + (rand() - 0.5) * 0.3;
+    const distance = (size * 0.32 + rand() * size * 0.08) * spread;
+    
+    // Reduce rings at smaller sizes
+    const ringCount = detailLevel === 'full' ? (2 + Math.floor(rand() * 2)) : 
+                      detailLevel === 'medium' ? 2 : 1;
     
     layers.push({
       type: 'concentric',
       x: center + Math.cos(angle) * distance,
       y: center + Math.sin(angle) * distance,
-      size: size * 0.12 + rand() * size * 0.08,
+      size: size * (detailLevel === 'minimal' ? 0.15 : 0.12) + rand() * size * 0.08,
       rotation: rand() * 360,
-      opacity: 0.5 + rand() * 0.3,
-      strokeWidth: 1.5 + rand() * 1,
-      variant: 2 + Math.floor(rand() * 2),
+      opacity: 0.6 + rand() * 0.3,
+      strokeWidth: Math.max(minStroke, 1.5 + rand() * 1),
+      variant: ringCount,
     });
   }
   
   // ===== ZONE 2: PRIMARY LINE CIRCLES =====
-  const numCircles = 3 + Math.floor(rand() * 2);
-  for (let i = 0; i < numCircles; i++) {
-    const angle = (i / numCircles) * Math.PI * 2 + rand() * 0.5;
-    const distance = size * 0.08 + rand() * size * 0.2;
+  for (let i = 0; i < counts.lineCircles; i++) {
+    const angle = (i / counts.lineCircles) * Math.PI * 2 + rand() * 0.5;
+    const distance = (size * 0.08 + rand() * size * 0.2) * spread;
     
     layers.push({
       type: 'line-circle',
       x: center + Math.cos(angle) * distance,
       y: center + Math.sin(angle) * distance,
-      size: size * 0.06 + rand() * size * 0.08,
+      size: size * (detailLevel === 'minimal' ? 0.1 : 0.06) + rand() * size * 0.08,
       rotation: rand() * 360,
       opacity: 0.7 + rand() * 0.3,
-      strokeWidth: 1.5 + rand() * 1.5,
+      strokeWidth: Math.max(minStroke, 1.5 + rand() * 1.5),
     });
   }
   
-  // ===== ZONE 3: SPIRALS =====
-  const numSpirals = 1 + Math.floor(rand() * 2);
-  for (let i = 0; i < numSpirals; i++) {
+  // ===== ZONE 3: SPIRALS (skip at minimal) =====
+  for (let i = 0; i < counts.spirals; i++) {
     const angle = rand() * Math.PI * 2;
-    const distance = size * 0.15 + rand() * size * 0.15;
+    const distance = (size * 0.15 + rand() * size * 0.15) * spread;
     
     layers.push({
       type: 'spiral',
@@ -112,51 +151,48 @@ function generateLayers(email: string, size: number): LayerElement[] {
       size: size * 0.08 + rand() * size * 0.06,
       rotation: rand() * 360,
       opacity: 0.6 + rand() * 0.3,
-      strokeWidth: 1.5 + rand() * 1,
+      strokeWidth: Math.max(minStroke, 1.5 + rand() * 1),
       variant: rand() > 0.5 ? 1 : -1, // clockwise or counter
     });
   }
   
   // ===== ZONE 4: TRIANGLES =====
-  const numTriangles = 2 + Math.floor(rand() * 2);
-  for (let i = 0; i < numTriangles; i++) {
+  for (let i = 0; i < counts.triangles; i++) {
     const charIndex = i % chars.length;
-    const angle = (i / numTriangles) * Math.PI * 2 + rand() * 0.8;
-    const distance = size * 0.2 + rand() * size * 0.18;
+    const angle = (i / counts.triangles) * Math.PI * 2 + rand() * 0.8;
+    const distance = (size * 0.2 + rand() * size * 0.18) * spread;
     
     layers.push({
       type: 'triangle',
       x: center + Math.cos(angle) * distance,
       y: center + Math.sin(angle) * distance,
-      size: size * 0.04 + rand() * size * 0.04,
+      size: size * (detailLevel === 'minimal' ? 0.06 : 0.04) + rand() * size * 0.04,
       rotation: (charIndex * 60) + rand() * 40,
       opacity: 0.7 + rand() * 0.3,
-      strokeWidth: 1.5 + rand() * 1,
+      strokeWidth: Math.max(minStroke, 1.5 + rand() * 1),
     });
   }
   
   // ===== ZONE 5: CROSS MARKS =====
-  const numCrosses = 3 + Math.floor(rand() * 3);
-  for (let i = 0; i < numCrosses; i++) {
+  for (let i = 0; i < counts.crosses; i++) {
     const angle = rand() * Math.PI * 2;
-    const distance = size * 0.1 + rand() * size * 0.35;
+    const distance = (size * 0.1 + rand() * size * 0.35) * spread;
     
     layers.push({
       type: 'cross',
       x: center + Math.cos(angle) * distance,
       y: center + Math.sin(angle) * distance,
-      size: size * 0.02 + rand() * size * 0.025,
+      size: size * (detailLevel === 'minimal' ? 0.035 : 0.02) + rand() * size * 0.025,
       rotation: rand() * 45,
-      opacity: 0.5 + rand() * 0.4,
-      strokeWidth: 1 + rand() * 1,
+      opacity: 0.6 + rand() * 0.4,
+      strokeWidth: Math.max(minStroke, 1 + rand() * 1),
     });
   }
   
-  // ===== ZONE 6: DOT CLUSTERS =====
-  const numDotClusters = 2 + Math.floor(rand() * 2);
-  for (let i = 0; i < numDotClusters; i++) {
+  // ===== ZONE 6: DOT CLUSTERS (skip at minimal) =====
+  for (let i = 0; i < counts.dots; i++) {
     const angle = rand() * Math.PI * 2;
-    const distance = size * 0.15 + rand() * size * 0.25;
+    const distance = (size * 0.15 + rand() * size * 0.25) * spread;
     
     layers.push({
       type: 'dots',
@@ -165,16 +201,15 @@ function generateLayers(email: string, size: number): LayerElement[] {
       size: size * 0.04 + rand() * size * 0.03,
       rotation: rand() * 360,
       opacity: 0.6 + rand() * 0.4,
-      strokeWidth: 1,
-      variant: 3 + Math.floor(rand() * 3), // number of dots
+      strokeWidth: Math.max(minStroke, 1),
+      variant: detailLevel === 'medium' ? 3 : (3 + Math.floor(rand() * 3)), // fewer dots at medium
     });
   }
   
-  // ===== ZONE 7: WAVY LINES =====
-  const numWavyLines = 2 + Math.floor(rand() * 2);
-  for (let i = 0; i < numWavyLines; i++) {
-    const angle = (i / numWavyLines) * Math.PI * 2 + rand() * 0.5;
-    const distance = size * 0.2 + rand() * size * 0.15;
+  // ===== ZONE 7: WAVY LINES (skip at minimal) =====
+  for (let i = 0; i < counts.wavyLines; i++) {
+    const angle = (i / counts.wavyLines) * Math.PI * 2 + rand() * 0.5;
+    const distance = (size * 0.2 + rand() * size * 0.15) * spread;
     
     layers.push({
       type: 'wavy-line',
@@ -183,16 +218,15 @@ function generateLayers(email: string, size: number): LayerElement[] {
       size: size * 0.1 + rand() * size * 0.1,
       rotation: rand() * 360,
       opacity: 0.5 + rand() * 0.3,
-      strokeWidth: 1 + rand() * 1,
-      variant: 2 + Math.floor(rand() * 2), // number of waves
+      strokeWidth: Math.max(minStroke, 1 + rand() * 1),
+      variant: detailLevel === 'medium' ? 2 : (2 + Math.floor(rand() * 2)), // fewer waves at medium
     });
   }
   
-  // ===== ZONE 8: CONNECTION LINES =====
-  const numConnections = 4 + Math.floor(rand() * 3);
-  for (let i = 0; i < numConnections; i++) {
+  // ===== ZONE 8: CONNECTION LINES (skip at minimal) =====
+  for (let i = 0; i < counts.connections; i++) {
     const angle = rand() * Math.PI * 2;
-    const distance = size * 0.1 + rand() * size * 0.3;
+    const distance = (size * 0.1 + rand() * size * 0.3) * spread;
     
     layers.push({
       type: 'connection',
@@ -200,8 +234,8 @@ function generateLayers(email: string, size: number): LayerElement[] {
       y: center + Math.sin(angle) * distance,
       size: size * 0.08 + rand() * size * 0.12,
       rotation: rand() * 360,
-      opacity: 0.3 + rand() * 0.3,
-      strokeWidth: 0.5 + rand() * 0.5,
+      opacity: 0.4 + rand() * 0.3,
+      strokeWidth: Math.max(minStroke * 0.6, 0.5 + rand() * 0.5),
     });
   }
   
@@ -317,7 +351,7 @@ function drawDots(ctx: CanvasRenderingContext2D, layer: LayerElement, lineColor:
     const dist = layer.size * (0.3 + rand() * 0.7);
     const dotX = layer.x + Math.cos(angle) * dist;
     const dotY = layer.y + Math.sin(angle) * dist;
-    const dotSize = 1.5 + rand() * 1.5;
+    const dotSize = Math.max(1.5, layer.strokeWidth * 0.8 + rand() * 1.5);
     
     dotPositions.push({x: dotX, y: dotY});
     
@@ -328,7 +362,7 @@ function drawDots(ctx: CanvasRenderingContext2D, layer: LayerElement, lineColor:
   
   // Connect some dots with thin lines
   ctx.strokeStyle = lineColor;
-  ctx.lineWidth = 0.5;
+  ctx.lineWidth = Math.max(0.5, layer.strokeWidth * 0.4);
   ctx.globalAlpha = layer.opacity * 0.5;
   for (let i = 0; i < dotPositions.length - 1; i++) {
     ctx.beginPath();
@@ -434,6 +468,7 @@ export function generateAvatarCanvas(email: string, size: number = 256, backgrou
   const hash = hashString(email);
   const bgRand = seededRandom(hash + 999);
   const lineColor = getLineColor(background);
+  const detailLevel = getDetailLevel(size);
   
   // Draw background based on type
   if (background === 'cosmos') {
@@ -449,12 +484,13 @@ export function generateAvatarCanvas(email: string, size: number = 256, backgrou
     ctx.fillStyle = bgGradient;
     ctx.fillRect(0, 0, size, size);
     
-    // Add subtle background stars (tiny white dots)
-    const numBgStars = 40 + Math.floor(bgRand() * 30);
-    for (let i = 0; i < numBgStars; i++) {
+    // Add subtle background stars (reduce at smaller sizes)
+    const starCount = detailLevel === 'full' ? (40 + Math.floor(bgRand() * 30)) :
+                      detailLevel === 'medium' ? 20 : 10;
+    for (let i = 0; i < starCount; i++) {
       const starX = bgRand() * size;
       const starY = bgRand() * size;
-      const starSize = 0.3 + bgRand() * 0.8;
+      const starSize = detailLevel === 'minimal' ? 0.5 : (0.3 + bgRand() * 0.8);
       const starOpacity = 0.15 + bgRand() * 0.25;
       
       ctx.save();
@@ -488,8 +524,11 @@ export function generateAvatarCanvas(email: string, size: number = 256, backgrou
     const textX = size / 2;
     const textY = size / 2 + size * 0.02;
     const fontSize = size * 0.85;
-    // Denser lines for smaller sizes, sparser for larger
-    const lineSpacing = Math.max(3, size * 0.025);
+    
+    // Adaptive line spacing for crosshatch - wider at smaller sizes
+    const lineSpacing = detailLevel === 'minimal' ? Math.max(6, size * 0.1) :
+                        detailLevel === 'medium' ? Math.max(4, size * 0.04) :
+                        Math.max(3, size * 0.025);
     const diagonal = size * 1.5;
     
     // Step 1: Create a mask canvas with the letter shape
@@ -503,15 +542,18 @@ export function generateAvatarCanvas(email: string, size: number = 256, backgrou
     maskCtx.fillStyle = 'white';
     maskCtx.fillText(firstLetter, textX, textY);
     
-    // Step 2: Create crosshatch canvas
+    // Step 2: Create crosshatch canvas (skip at very small sizes for cleaner look)
     const crosshatchCanvas = document.createElement('canvas');
     crosshatchCanvas.width = size;
     crosshatchCanvas.height = size;
     const crossCtx = crosshatchCanvas.getContext('2d')!;
     
     // Draw crosshatch lines - thicker for small sizes
+    const crosshatchStroke = detailLevel === 'minimal' ? Math.max(2, size * 0.03) :
+                             detailLevel === 'medium' ? Math.max(1.5, size * 0.015) :
+                             Math.max(1.5, size * 0.012);
     crossCtx.strokeStyle = lineColor;
-    crossCtx.lineWidth = Math.max(1.5, size * 0.012);
+    crossCtx.lineWidth = crosshatchStroke;
     crossCtx.lineCap = 'round';
     
     // Diagonal lines from top-left to bottom-right
@@ -522,21 +564,25 @@ export function generateAvatarCanvas(email: string, size: number = 256, backgrou
       crossCtx.stroke();
     }
     
-    // Diagonal lines from top-right to bottom-left
-    for (let i = -diagonal; i < diagonal; i += lineSpacing) {
-      crossCtx.beginPath();
-      crossCtx.moveTo(size - i, 0);
-      crossCtx.lineTo(-i, size);
-      crossCtx.stroke();
+    // Diagonal lines from top-right to bottom-left (skip at minimal for cleaner look)
+    if (detailLevel !== 'minimal') {
+      for (let i = -diagonal; i < diagonal; i += lineSpacing) {
+        crossCtx.beginPath();
+        crossCtx.moveTo(size - i, 0);
+        crossCtx.lineTo(-i, size);
+        crossCtx.stroke();
+      }
     }
     
     // Step 3: Apply mask - keep crosshatch only where letter exists
     crossCtx.globalCompositeOperation = 'destination-in';
     crossCtx.drawImage(maskCanvas, 0, 0);
     
-    // Step 4: Draw filled letter base (stronger for visibility)
+    // Step 4: Draw filled letter base (stronger for visibility at small sizes)
+    const baseFillOpacity = detailLevel === 'minimal' ? 0.2 : 
+                            detailLevel === 'medium' ? 0.15 : 0.12;
     ctx.save();
-    ctx.globalAlpha = 0.12;
+    ctx.globalAlpha = baseFillOpacity;
     ctx.fillStyle = lineColor;
     ctx.font = `bold ${fontSize}px Arial, sans-serif`;
     ctx.textAlign = 'center';
@@ -544,17 +590,24 @@ export function generateAvatarCanvas(email: string, size: number = 256, backgrou
     ctx.fillText(firstLetter, textX, textY);
     ctx.restore();
     
-    // Step 5: Draw the masked crosshatch onto main canvas (higher opacity)
+    // Step 5: Draw the masked crosshatch onto main canvas (higher opacity at small sizes)
+    const crosshatchOpacity = detailLevel === 'minimal' ? 0.35 :
+                              detailLevel === 'medium' ? 0.3 : 0.28;
     ctx.save();
-    ctx.globalAlpha = 0.28;
+    ctx.globalAlpha = crosshatchOpacity;
     ctx.drawImage(crosshatchCanvas, 0, 0);
     ctx.restore();
     
-    // Step 6: Stroke/border for definition (stronger)
+    // Step 6: Stroke/border for definition (thicker at small sizes)
+    const borderOpacity = detailLevel === 'minimal' ? 0.35 :
+                          detailLevel === 'medium' ? 0.25 : 0.2;
+    const borderWidth = detailLevel === 'minimal' ? Math.max(2.5, size * 0.04) :
+                        detailLevel === 'medium' ? Math.max(2, size * 0.02) :
+                        Math.max(1.5, size * 0.015);
     ctx.save();
-    ctx.globalAlpha = 0.2;
+    ctx.globalAlpha = borderOpacity;
     ctx.strokeStyle = lineColor;
-    ctx.lineWidth = Math.max(1.5, size * 0.015);
+    ctx.lineWidth = borderWidth;
     ctx.font = `bold ${fontSize}px Arial, sans-serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
@@ -598,6 +651,8 @@ export function generateAvatarSVG(email: string, size: number = 256, background:
   const hash = hashString(email);
   const rand = seededRandom(hash);
   const lineColor = getLineColor(background);
+  const detailLevel = getDetailLevel(size);
+  const minStroke = getMinStrokeWidth(size);
   
   let shapes = '';
   let bgDefs = '';
@@ -614,13 +669,14 @@ export function generateAvatarSVG(email: string, size: number = 256, background:
       </radialGradient>`;
     bgRect = `<rect width="${size}" height="${size}" fill="url(#bgGrad)"/>`;
     
-    // Background stars
+    // Background stars (reduced at smaller sizes)
     const bgRand = seededRandom(hash + 999);
-    const numBgStars = 40 + Math.floor(bgRand() * 30);
-    for (let i = 0; i < numBgStars; i++) {
+    const starCount = detailLevel === 'full' ? (40 + Math.floor(bgRand() * 30)) :
+                      detailLevel === 'medium' ? 20 : 10;
+    for (let i = 0; i < starCount; i++) {
       const starX = bgRand() * size;
       const starY = bgRand() * size;
-      const starSize = 0.3 + bgRand() * 0.8;
+      const starSize = detailLevel === 'minimal' ? 0.5 : (0.3 + bgRand() * 0.8);
       const starOpacity = 0.15 + bgRand() * 0.25;
       shapes += `<circle cx="${starX}" cy="${starY}" r="${starSize}" fill="#ffffff" opacity="${starOpacity}"/>`;
     }
@@ -639,7 +695,10 @@ export function generateAvatarSVG(email: string, size: number = 256, background:
   // Add first letter silhouette with crosshatch pattern (blueprint aesthetic)
   const firstLetter = getFirstLetter(email);
   if (firstLetter) {
-    const lineSpacing = Math.max(4, size * 0.035);
+    // Adaptive line spacing
+    const lineSpacing = detailLevel === 'minimal' ? Math.max(6, size * 0.1) :
+                        detailLevel === 'medium' ? Math.max(4, size * 0.04) :
+                        Math.max(4, size * 0.035);
     const clipId = `letterClip-${Math.random().toString(36).substr(2, 9)}`;
     
     // Define clip path for the letter
@@ -648,27 +707,41 @@ export function generateAvatarSVG(email: string, size: number = 256, background:
         <text x="${size / 2}" y="${size / 2}" dy="0.35em" font-family="Arial, sans-serif" font-size="${size * 0.85}" font-weight="bold" text-anchor="middle">${firstLetter}</text>
       </clipPath>`;
     
-    // Base fill for visibility
-    shapes += `<text x="${size / 2}" y="${size / 2}" dy="0.35em" font-family="Arial, sans-serif" font-size="${size * 0.85}" font-weight="bold" fill="${lineColor}" opacity="0.10" text-anchor="middle">${firstLetter}</text>`;
+    // Base fill for visibility (stronger at small sizes)
+    const baseFillOpacity = detailLevel === 'minimal' ? 0.2 : 
+                            detailLevel === 'medium' ? 0.15 : 0.10;
+    shapes += `<text x="${size / 2}" y="${size / 2}" dy="0.35em" font-family="Arial, sans-serif" font-size="${size * 0.85}" font-weight="bold" fill="${lineColor}" opacity="${baseFillOpacity}" text-anchor="middle">${firstLetter}</text>`;
     
     // Crosshatch pattern clipped to letter shape
     let crosshatchLines = '';
     const diagonal = size * 1.5;
+    const crosshatchStroke = detailLevel === 'minimal' ? Math.max(2, size * 0.03) :
+                             detailLevel === 'medium' ? Math.max(1.5, size * 0.012) :
+                             Math.max(1, size * 0.006);
     
     // Diagonal lines from top-left to bottom-right
     for (let i = -diagonal; i < diagonal; i += lineSpacing) {
-      crosshatchLines += `<line x1="${i}" y1="0" x2="${i + size}" y2="${size}" stroke="${lineColor}" stroke-width="${Math.max(1, size * 0.006)}" stroke-linecap="round"/>`;
+      crosshatchLines += `<line x1="${i}" y1="0" x2="${i + size}" y2="${size}" stroke="${lineColor}" stroke-width="${crosshatchStroke}" stroke-linecap="round"/>`;
     }
     
-    // Diagonal lines from top-right to bottom-left
-    for (let i = -diagonal; i < diagonal; i += lineSpacing) {
-      crosshatchLines += `<line x1="${size - i}" y1="0" x2="${-i}" y2="${size}" stroke="${lineColor}" stroke-width="${Math.max(1, size * 0.006)}" stroke-linecap="round"/>`;
+    // Diagonal lines from top-right to bottom-left (skip at minimal for cleaner look)
+    if (detailLevel !== 'minimal') {
+      for (let i = -diagonal; i < diagonal; i += lineSpacing) {
+        crosshatchLines += `<line x1="${size - i}" y1="0" x2="${-i}" y2="${size}" stroke="${lineColor}" stroke-width="${crosshatchStroke}" stroke-linecap="round"/>`;
+      }
     }
     
-    shapes += `<g clip-path="url(#${clipId})" opacity="0.15">${crosshatchLines}</g>`;
+    const crosshatchOpacity = detailLevel === 'minimal' ? 0.35 :
+                              detailLevel === 'medium' ? 0.2 : 0.15;
+    shapes += `<g clip-path="url(#${clipId})" opacity="${crosshatchOpacity}">${crosshatchLines}</g>`;
     
-    // Stroked border for definition
-    shapes += `<text x="${size / 2}" y="${size / 2}" dy="0.35em" font-family="Arial, sans-serif" font-size="${size * 0.85}" font-weight="bold" fill="none" stroke="${lineColor}" stroke-width="${size * 0.012}" opacity="0.12" text-anchor="middle">${firstLetter}</text>`;
+    // Stroked border for definition (thicker at small sizes)
+    const borderOpacity = detailLevel === 'minimal' ? 0.35 :
+                          detailLevel === 'medium' ? 0.18 : 0.12;
+    const borderWidth = detailLevel === 'minimal' ? Math.max(2.5, size * 0.04) :
+                        detailLevel === 'medium' ? Math.max(2, size * 0.018) :
+                        size * 0.012;
+    shapes += `<text x="${size / 2}" y="${size / 2}" dy="0.35em" font-family="Arial, sans-serif" font-size="${size * 0.85}" font-weight="bold" fill="none" stroke="${lineColor}" stroke-width="${borderWidth}" opacity="${borderOpacity}" text-anchor="middle">${firstLetter}</text>`;
   }
   
   // Generate layers and convert to SVG
@@ -676,7 +749,7 @@ export function generateAvatarSVG(email: string, size: number = 256, background:
   
   layers.forEach(layer => {
     const opacity = layer.opacity.toFixed(2);
-    const sw = layer.strokeWidth.toFixed(1);
+    const sw = Math.max(minStroke, layer.strokeWidth).toFixed(1);
     
     switch (layer.type) {
       case 'line-circle':
@@ -744,7 +817,7 @@ export function generateAvatarSVG(email: string, size: number = 256, background:
           const dist = layer.size * (0.3 + dotRand() * 0.7);
           const dotX = layer.x + Math.cos(angle) * dist;
           const dotY = layer.y + Math.sin(angle) * dist;
-          const dotSize = 1.5 + dotRand() * 1.5;
+          const dotSize = Math.max(1.5, minStroke * 0.8 + dotRand() * 1.5);
           
           dotPositions.push({x: dotX, y: dotY});
           shapes += `<circle cx="${dotX.toFixed(1)}" cy="${dotY.toFixed(1)}" r="${dotSize.toFixed(1)}" fill="${lineColor}" opacity="${opacity}"/>`;
@@ -752,7 +825,7 @@ export function generateAvatarSVG(email: string, size: number = 256, background:
         
         // Connect dots
         for (let i = 0; i < dotPositions.length - 1; i++) {
-          shapes += `<line x1="${dotPositions[i].x.toFixed(1)}" y1="${dotPositions[i].y.toFixed(1)}" x2="${dotPositions[i + 1].x.toFixed(1)}" y2="${dotPositions[i + 1].y.toFixed(1)}" stroke="${lineColor}" stroke-width="0.5" opacity="${(layer.opacity * 0.5).toFixed(2)}"/>`;
+          shapes += `<line x1="${dotPositions[i].x.toFixed(1)}" y1="${dotPositions[i].y.toFixed(1)}" x2="${dotPositions[i + 1].x.toFixed(1)}" y2="${dotPositions[i + 1].y.toFixed(1)}" stroke="${lineColor}" stroke-width="${Math.max(0.5, minStroke * 0.4).toFixed(1)}" opacity="${(layer.opacity * 0.5).toFixed(2)}"/>`;
         }
         break;
         
