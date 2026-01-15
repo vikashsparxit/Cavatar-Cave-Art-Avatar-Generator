@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Mail, Download, Copy, Check, Sparkles, Code2, Zap, Palette, AlertCircle, FileImage, FileCode, BookOpen, Circle, Square } from "lucide-react";
+import { Mail, Download, Copy, Check, Sparkles, Code2, Zap, Palette, AlertCircle, FileImage, FileCode, BookOpen, Circle, Square, Triangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AvatarPreview } from "@/components/AvatarPreview";
 import { CharacterBreakdown } from "@/components/CharacterBreakdown";
@@ -439,6 +439,17 @@ with open('avatar.png', 'wb') as f:
                     >
                       <Circle className="w-4 h-4" />
                       Circle
+                    </button>
+                    <button
+                      onClick={() => setSelectedShape('triangle')}
+                      className={`flex-1 h-10 rounded-lg font-medium text-sm transition-all flex items-center justify-center gap-2 ${
+                        selectedShape === 'triangle'
+                          ? 'bg-primary text-primary-foreground shadow-md'
+                          : 'bg-muted hover:bg-muted/80 text-muted-foreground'
+                      }`}
+                    >
+                      <Triangle className="w-4 h-4" />
+                      Triangle
                     </button>
                   </div>
                 </div>

@@ -1,7 +1,7 @@
 // Cave art / petroglyphic style avatar generation with white line drawings
 
 export type BackgroundType = 'cosmos' | 'white' | string;
-export type AvatarShape = 'rounded' | 'circle';
+export type AvatarShape = 'rounded' | 'circle' | 'triangle';
 export type ImageFormat = 'png' | 'webp' | 'jpeg';
 type DetailLevel = 'full' | 'medium' | 'minimal';
 
@@ -67,6 +67,126 @@ function getSpreadFactor(size: number): number {
   return 1.0;
 }
 
+// Check if a point is inside a triangle (using barycentric coordinates)
+function isPointInTriangleBounds(
+  px: number, py: number,
+  x1: number, y1: number,
+  x2: number, y2: number,
+  x3: number, y3: number
+): boolean {
+  const denom = (y2 - y3) * (x1 - x3) + (x3 - x2) * (y1 - y3);
+  const a = ((y2 - y3) * (px - x3) + (x3 - x2) * (py - y3)) / denom;
+  const b = ((y3 - y1) * (px - x3) + (x1 - x3) * (py - y3)) / denom;
+  const c = 1 - a - b;
+  return a >= 0 && a <= 1 && b >= 0 && b <= 1 && c >= 0 && c <= 1;
+}
+
+// Check if a point (with element radius) is inside the safe zone for the given shape
+function isPointInSafeZone(
+  x: number, y: number,
+  elementRadius: number,
+  canvasSize: number,
+  shape: AvatarShape
+): boolean {
+  const center = canvasSize / 2;
+  const margin = elementRadius + canvasSize * 0.02; // Buffer margin
+  
+  if (shape === 'circle') {
+    const dist = Math.sqrt((x - center) ** 2 + (y - center) ** 2);
+    return dist + margin < center;
+  } 
+  else if (shape === 'triangle') {
+    // Triangle pointing up with apex at top center
+    const topMargin = margin * 1.5; // Extra margin at pointed top
+    const top = { x: center, y: topMargin };
+    const bottomLeft = { x: margin, y: canvasSize - margin };
+    const bottomRight = { x: canvasSize - margin, y: canvasSize - margin };
+    
+    // Check if point with its radius is inside the shrunken triangle
+    return isPointInTriangleBounds(
+      x, y,
+      top.x, top.y,
+      bottomLeft.x, bottomLeft.y,
+      bottomRight.x, bottomRight.y
+    );
+  } 
+  else {
+    // Rounded rectangle - check if point is within bounds minus corner radius
+    const cornerRadius = canvasSize * 0.15;
+    const inBounds = x >= margin && x <= canvasSize - margin && 
+                     y >= margin && y <= canvasSize - margin;
+    
+    if (!inBounds) return false;
+    
+    // Check corners more carefully
+    const corners = [
+      { cx: cornerRadius, cy: cornerRadius }, // top-left
+      { cx: canvasSize - cornerRadius, cy: cornerRadius }, // top-right
+      { cx: cornerRadius, cy: canvasSize - cornerRadius }, // bottom-left
+      { cx: canvasSize - cornerRadius, cy: canvasSize - cornerRadius } // bottom-right
+    ];
+    
+    for (const corner of corners) {
+      const inCornerZone = (x < cornerRadius || x > canvasSize - cornerRadius) &&
+                           (y < cornerRadius || y > canvasSize - cornerRadius);
+      if (inCornerZone) {
+        const distToCorner = Math.sqrt((x - corner.cx) ** 2 + (y - corner.cy) ** 2);
+        if (distToCorner + margin > cornerRadius) return false;
+      }
+    }
+    
+    return true;
+  }
+}
+
+// Constrain layers to fit within the avatar shape
+function constrainLayersToShape(
+  layers: LayerElement[],
+  size: number,
+  shape: AvatarShape
+): LayerElement[] {
+  const center = size / 2;
+  
+  return layers.map(layer => {
+    let { x, y, size: elementSize } = layer;
+    const elementRadius = elementSize;
+    
+    // Check if element is in safe zone
+    if (!isPointInSafeZone(x, y, elementRadius, size, shape)) {
+      // Calculate pull factor based on shape
+      let pullFactor = 0.65;
+      if (shape === 'triangle') {
+        // For triangles, pull more toward center-bottom (where there's more space)
+        pullFactor = 0.55;
+        // Also shift the center of gravity lower
+        const targetY = center + size * 0.1;
+        y = targetY + (y - center) * pullFactor;
+        x = center + (x - center) * pullFactor;
+      } else {
+        x = center + (x - center) * pullFactor;
+        y = center + (y - center) * pullFactor;
+      }
+      
+      // Reduce element size slightly
+      elementSize *= 0.85;
+      
+      // If still not in safe zone after pull, reduce size more
+      if (!isPointInSafeZone(x, y, elementSize, size, shape)) {
+        elementSize *= 0.7;
+        // Pull even closer to center
+        const extraPull = 0.7;
+        x = center + (x - center) * extraPull;
+        y = center + (y - center) * extraPull;
+      }
+    }
+    
+    return { ...layer, x, y, size: elementSize };
+  }).filter(layer => {
+    // Final filter - only keep elements that fit in the shape
+    return isPointInSafeZone(layer.x, layer.y, layer.size * 0.5, size, shape);
+  });
+}
+
 interface LayerElement {
   type: 'line-circle' | 'concentric' | 'spiral' | 'triangle' | 'cross' | 'dots' | 'wavy-line' | 'connection';
   x: number;
@@ -78,7 +198,7 @@ interface LayerElement {
   variant?: number;
 }
 
-function generateLayers(email: string, size: number): LayerElement[] {
+function generateLayers(email: string, size: number, shape: AvatarShape = 'rounded'): LayerElement[] {
   const hash = hashString(email);
   const rand = seededRandom(hash);
   const chars = email.toUpperCase().replace(/[^A-Z0-9@._\-+]/g, '').split('');
@@ -239,7 +359,8 @@ function generateLayers(email: string, size: number): LayerElement[] {
     });
   }
   
-  return layers;
+  // Constrain layers to fit within the avatar shape
+  return constrainLayersToShape(layers, size, shape);
 }
 
 function drawLineCircle(ctx: CanvasRenderingContext2D, layer: LayerElement, lineColor: string): void {
@@ -615,15 +736,21 @@ export function generateAvatarCanvas(email: string, size: number = 256, backgrou
     ctx.restore();
   }
   
-  // Generate and draw layers
-  const layers = generateLayers(email, size);
+  // Generate and draw layers (pass shape for containment)
+  const layers = generateLayers(email, size, shape);
   layers.forEach(layer => drawLayer(ctx, layer, lineColor));
   
-  // Shape mask (rounded or circle)
+  // Shape mask (rounded, circle, or triangle)
   ctx.globalCompositeOperation = 'destination-in';
   ctx.beginPath();
   if (shape === 'circle') {
     ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
+  } else if (shape === 'triangle') {
+    // Equilateral triangle pointing up
+    ctx.moveTo(size / 2, 0);           // Top center
+    ctx.lineTo(size, size);             // Bottom right
+    ctx.lineTo(0, size);                // Bottom left
+    ctx.closePath();
   } else {
     const radius = size * 0.15;
     ctx.roundRect(0, 0, size, size, radius);
@@ -744,8 +871,8 @@ export function generateAvatarSVG(email: string, size: number = 256, background:
     shapes += `<text x="${size / 2}" y="${size / 2}" dy="0.35em" font-family="Arial, sans-serif" font-size="${size * 0.85}" font-weight="bold" fill="none" stroke="${lineColor}" stroke-width="${borderWidth}" opacity="${borderOpacity}" text-anchor="middle">${firstLetter}</text>`;
   }
   
-  // Generate layers and convert to SVG
-  const layers = generateLayers(email, size);
+  // Generate layers and convert to SVG (pass shape for containment)
+  const layers = generateLayers(email, size, shape);
   
   layers.forEach(layer => {
     const opacity = layer.opacity.toFixed(2);
@@ -867,6 +994,8 @@ export function generateAvatarSVG(email: string, size: number = 256, background:
   // Clip path based on shape
   const clipPathDef = shape === 'circle'
     ? `<circle cx="${size / 2}" cy="${size / 2}" r="${size / 2}"/>`
+    : shape === 'triangle'
+    ? `<polygon points="${size / 2},0 ${size},${size} 0,${size}"/>`
     : `<rect width="${size}" height="${size}" rx="${size * 0.15}" ry="${size * 0.15}"/>`;
   
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
