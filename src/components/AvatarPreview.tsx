@@ -19,10 +19,16 @@ export const AvatarPreview = ({ email, size = 256, className = "", background = 
     }
   }, [email, size, background, shape]);
   
+  const getShapeClass = () => {
+    if (shape === 'circle') return 'rounded-full';
+    if (shape === 'triangle') return ''; // Triangle clip is handled by canvas
+    return 'rounded-xl';
+  };
+  
   if (!email || !avatarUrl) {
     return (
       <div 
-        className={`bg-muted flex items-center justify-center ${shape === 'circle' ? 'rounded-full' : 'rounded-xl'} ${className}`}
+        className={`bg-muted flex items-center justify-center ${getShapeClass()} ${className}`}
         style={{ width: size, height: size }}
       >
         <span className="text-muted-foreground text-sm">Enter email</span>
@@ -34,7 +40,7 @@ export const AvatarPreview = ({ email, size = 256, className = "", background = 
     <img 
       src={avatarUrl} 
       alt={`Avatar for ${email}`}
-      className={`${shape === 'circle' ? 'rounded-full' : 'rounded-xl'} shadow-avatar ${className}`}
+      className={`${getShapeClass()} shadow-avatar ${className}`}
       style={{ width: size, height: size }}
     />
   );
