@@ -180,12 +180,12 @@ with open('avatar.png', 'wb') as f:
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="relative flex justify-center"
+              className="relative flex justify-center py-12"
             >
               <TooltipProvider delayDuration={200}>
-                <div className="relative">
+                <div className="relative w-[350px] h-[350px] flex items-center justify-center">
                   {/* Main avatar - rotating celebrity */}
-                  <div className="animate-float">
+                  <div className="animate-float z-10">
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <div className="cursor-pointer">
@@ -201,7 +201,7 @@ with open('avatar.png', 'wb') as f:
                   
                   {/* Floating smaller avatars - other celebrities */}
                   <motion.div
-                    className="absolute -top-8 -left-12"
+                    className="absolute -top-4 left-0 z-20"
                     animate={{ y: [0, -10, 0] }}
                     transition={{ duration: 4, repeat: Infinity, delay: 0.5 }}
                   >
@@ -218,7 +218,7 @@ with open('avatar.png', 'wb') as f:
                     </Tooltip>
                   </motion.div>
                   <motion.div
-                    className="absolute -bottom-4 -right-16"
+                    className="absolute -bottom-4 right-0 z-20"
                     animate={{ y: [0, -8, 0] }}
                     transition={{ duration: 3.5, repeat: Infinity, delay: 1 }}
                   >
@@ -235,7 +235,7 @@ with open('avatar.png', 'wb') as f:
                     </Tooltip>
                   </motion.div>
                   <motion.div
-                    className="absolute top-1/2 -right-20"
+                    className="absolute top-1/3 -right-8 z-20"
                     animate={{ y: [0, -12, 0] }}
                     transition={{ duration: 5, repeat: Infinity, delay: 0.2 }}
                   >
