@@ -481,16 +481,17 @@ export function generateAvatarCanvas(email: string, size: number = 256, backgrou
     ctx.fillRect(0, 0, size, size);
   }
   
-  // Draw first letter silhouette (subtle watermark behind elements)
+  // Draw first letter silhouette (subtle outline behind elements)
   const firstLetter = getFirstLetter(email);
   if (firstLetter) {
     ctx.save();
-    ctx.globalAlpha = 0.12;
-    ctx.fillStyle = lineColor;
-    ctx.font = `bold ${size * 0.75}px Arial, sans-serif`;
+    ctx.globalAlpha = 0.08;
+    ctx.strokeStyle = lineColor;
+    ctx.lineWidth = size * 0.02;
+    ctx.font = `bold ${size * 0.9}px Arial, sans-serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText(firstLetter, size / 2, size / 2);
+    ctx.strokeText(firstLetter, size / 2, size / 2);
     ctx.restore();
   }
   
@@ -560,10 +561,10 @@ export function generateAvatarSVG(email: string, size: number = 256, background:
     bgRect = `<rect width="${size}" height="${size}" fill="${background}"/>`;
   }
   
-  // Add first letter silhouette
+  // Add first letter silhouette (outline only)
   const firstLetter = getFirstLetter(email);
   if (firstLetter) {
-    shapes += `<text x="${size / 2}" y="${size / 2}" font-family="Arial, sans-serif" font-size="${size * 0.75}" font-weight="bold" fill="${lineColor}" opacity="0.12" text-anchor="middle" dominant-baseline="central">${firstLetter}</text>`;
+    shapes += `<text x="${size / 2}" y="${size / 2}" font-family="Arial, sans-serif" font-size="${size * 0.9}" font-weight="bold" fill="none" stroke="${lineColor}" stroke-width="${size * 0.02}" opacity="0.08" text-anchor="middle" dominant-baseline="central">${firstLetter}</text>`;
   }
   
   // Generate layers and convert to SVG
