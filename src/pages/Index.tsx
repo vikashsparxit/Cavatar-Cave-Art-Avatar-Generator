@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Mail, Download, Copy, Check, Sparkles, Code2, Zap, Palette } from "lucide-react";
+import { Mail, Download, Copy, Check, Sparkles, Code2, Zap, Palette, AlertCircle, FileImage, FileCode } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AvatarPreview } from "@/components/AvatarPreview";
 import { CharacterBreakdown } from "@/components/CharacterBreakdown";
 import { CodeExample } from "@/components/CodeExample";
-import { generateAvatarDataURL, BackgroundType } from "@/lib/avatarGenerator";
+import { generateAvatarDataURL, generateAvatarSVG, BackgroundType, isValidEmail } from "@/lib/avatarGenerator";
 
 const DEMO_EMAILS = [
   "vikashshingh@gmail.com",
@@ -15,6 +15,7 @@ const DEMO_EMAILS = [
 ];
 
 type BackgroundOption = 'cosmos' | 'white' | 'custom';
+type SizeOption = 128 | 256 | 512;
 
 const Index = () => {
   const [email, setEmail] = useState("vikashshingh@gmail.com");
@@ -22,6 +23,17 @@ const Index = () => {
   const [demoIndex, setDemoIndex] = useState(0);
   const [bgOption, setBgOption] = useState<BackgroundOption>('cosmos');
   const [customColor, setCustomColor] = useState('#6366f1');
+  const [selectedSize, setSelectedSize] = useState<SizeOption>(256);
+  const [emailError, setEmailError] = useState<string | null>(null);
+
+  // Validate email when it changes
+  useEffect(() => {
+    if (email && !isValidEmail(email)) {
+      setEmailError("Please enter a valid email address");
+    } else {
+      setEmailError(null);
+    }
+  }, [email]);
 
   // Get the actual background value to pass to avatar generator
   const getBackground = (): BackgroundType => {
@@ -37,27 +49,50 @@ const Index = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const handleDownload = () => {
-    const dataUrl = generateAvatarDataURL(email, 512, getBackground());
+  const handleDownloadPNG = () => {
+    if (!isValidEmail(email)) {
+      setEmailError("Please enter a valid email address");
+      return;
+    }
+    const dataUrl = generateAvatarDataURL(email, selectedSize, getBackground());
     const link = document.createElement("a");
-    link.download = `avatar-${email.split("@")[0]}.png`;
+    link.download = `avatar-${email.split("@")[0]}-${selectedSize}px.png`;
     link.href = dataUrl;
     link.click();
   };
 
+  const handleDownloadSVG = () => {
+    if (!isValidEmail(email)) {
+      setEmailError("Please enter a valid email address");
+      return;
+    }
+    const svgContent = generateAvatarSVG(email, selectedSize, getBackground());
+    const blob = new Blob([svgContent], { type: 'image/svg+xml' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.download = `avatar-${email.split("@")[0]}-${selectedSize}px.svg`;
+    link.href = url;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
   const handleCopyUrl = async () => {
+    if (!isValidEmail(email)) {
+      setEmailError("Please enter a valid email address");
+      return;
+    }
     const bgParam = bgOption === 'custom' ? encodeURIComponent(customColor) : bgOption;
-    const url = `https://api.avatargen.io/v1/avatar?email=${encodeURIComponent(email)}&background=${bgParam}`;
+    const url = `https://api.avatargen.io/v1/avatar?email=${encodeURIComponent(email)}&size=${selectedSize}&background=${bgParam}`;
     await navigator.clipboard.writeText(url);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
   const bgParam = bgOption === 'custom' ? customColor : bgOption;
-  const curlExample = `curl "https://api.avatargen.io/v1/avatar?email=${email}&size=256&format=png&background=${bgParam}" -o avatar.png`;
+  const curlExample = `curl "https://api.avatargen.io/v1/avatar?email=${email}&size=${selectedSize}&format=png&background=${bgParam}" -o avatar.png`;
 
   const jsExample = `const email = '${email}';
-const avatarUrl = \`https://api.avatargen.io/v1/avatar?email=\${encodeURIComponent(email)}&size=256&background=${bgParam}\`;
+const avatarUrl = \`https://api.avatargen.io/v1/avatar?email=\${encodeURIComponent(email)}&size=${selectedSize}&background=${bgParam}\`;
 
 // Use in img tag
 <img src={avatarUrl} alt="User Avatar" />`;
@@ -65,11 +100,13 @@ const avatarUrl = \`https://api.avatargen.io/v1/avatar?email=\${encodeURICompone
   const pythonExample = `import requests
 
 email = '${email}'
-url = f'https://api.avatargen.io/v1/avatar?email={email}&size=256&format=png&background=${bgParam}'
+url = f'https://api.avatargen.io/v1/avatar?email={email}&size=${selectedSize}&format=png&background=${bgParam}'
 response = requests.get(url)
 
 with open('avatar.png', 'wb') as f:
     f.write(response.content)`;
+
+  const isEmailValid = isValidEmail(email);
 
   return (
     <div className="min-h-screen bg-background">
@@ -208,9 +245,21 @@ with open('avatar.png', 'wb') as f:
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="Enter email address"
-                      className="w-full h-14 pl-12 pr-4 rounded-xl bg-muted/50 border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all font-mono text-sm"
+                      className={`w-full h-14 pl-12 pr-4 rounded-xl bg-muted/50 border ${
+                        emailError ? 'border-destructive focus:border-destructive focus:ring-destructive/20' : 'border-border focus:border-primary focus:ring-primary/20'
+                      } focus:ring-2 outline-none transition-all font-mono text-sm`}
                     />
                   </div>
+                  {emailError && (
+                    <motion.p
+                      initial={{ opacity: 0, y: -5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="flex items-center gap-2 text-sm text-destructive"
+                    >
+                      <AlertCircle className="w-4 h-4" />
+                      {emailError}
+                    </motion.p>
+                  )}
                 </div>
 
                 {/* Background selector */}
@@ -274,20 +323,60 @@ with open('avatar.png', 'wb') as f:
                   )}
                 </div>
 
+                {/* Size selector */}
+                <div className="space-y-3">
+                  <label className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
+                    Size
+                  </label>
+                  <div className="flex gap-2">
+                    {([128, 256, 512] as SizeOption[]).map((size) => (
+                      <button
+                        key={size}
+                        onClick={() => setSelectedSize(size)}
+                        className={`flex-1 h-10 rounded-lg font-medium text-sm transition-all ${
+                          selectedSize === size
+                            ? 'bg-primary text-primary-foreground shadow-md'
+                            : 'bg-muted hover:bg-muted/80 text-muted-foreground'
+                        }`}
+                      >
+                        {size}px
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
                 {/* Action buttons */}
                 <div className="flex gap-3">
-                  <Button variant="glow" className="flex-1" onClick={handleDownload}>
-                    <Download className="w-4 h-4" />
-                    Download PNG
+                  <Button 
+                    variant="glow" 
+                    className="flex-1" 
+                    onClick={handleDownloadPNG}
+                    disabled={!isEmailValid}
+                  >
+                    <FileImage className="w-4 h-4" />
+                    PNG
                   </Button>
-                  <Button variant="outline" onClick={handleCopyUrl}>
+                  <Button 
+                    variant="glow" 
+                    className="flex-1" 
+                    onClick={handleDownloadSVG}
+                    disabled={!isEmailValid}
+                  >
+                    <FileCode className="w-4 h-4" />
+                    SVG
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    onClick={handleCopyUrl}
+                    disabled={!isEmailValid}
+                  >
                     {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                    {copied ? "Copied!" : "Copy URL"}
+                    {copied ? "Copied!" : "URL"}
                   </Button>
                 </div>
 
                 {/* Character breakdown */}
-                <CharacterBreakdown email={email} />
+                {isEmailValid && <CharacterBreakdown email={email} />}
               </motion.div>
 
               {/* Avatar preview */}
@@ -297,9 +386,15 @@ with open('avatar.png', 'wb') as f:
                 viewport={{ once: true }}
                 className="flex flex-col items-center gap-6"
               >
-                <AvatarPreview email={email} size={320} background={getBackground()} className="shadow-avatar" />
+                {isEmailValid ? (
+                  <AvatarPreview email={email} size={320} background={getBackground()} className="shadow-avatar" />
+                ) : (
+                  <div className="w-[320px] h-[320px] rounded-xl bg-muted/50 border border-border flex items-center justify-center">
+                    <p className="text-muted-foreground text-sm">Enter a valid email</p>
+                  </div>
+                )}
                 <div className="text-center space-y-2">
-                  <p className="text-sm text-muted-foreground">256 × 256 pixels</p>
+                  <p className="text-sm text-muted-foreground">{selectedSize} × {selectedSize} pixels</p>
                   <p className="font-mono text-xs text-muted-foreground/60 break-all max-w-[300px]">
                     {email || "your-email@example.com"}
                   </p>
@@ -349,7 +444,7 @@ with open('avatar.png', 'wb') as f:
                   <div className="flex items-center gap-4">
                     <span className="text-primary">email</span>
                     <span className="text-muted-foreground">(required)</span>
-                    <span className="text-foreground/70">Email address to generate avatar</span>
+                    <span className="text-foreground/70">Valid email address</span>
                   </div>
                   <div className="flex items-center gap-4">
                     <span className="text-primary">size</span>

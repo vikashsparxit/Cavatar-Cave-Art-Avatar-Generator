@@ -394,15 +394,30 @@ function drawLayer(ctx: CanvasRenderingContext2D, layer: LayerElement, lineColor
   }
 }
 
+// Map each unique character to a consistent shape based on its ASCII code
+const SHAPE_TYPES = ['line-circle', 'concentric', 'spiral', 'triangle', 'cross', 'dots', 'wavy-line'] as const;
+
+function getShapeForChar(char: string): string {
+  const code = char.charCodeAt(0);
+  // Use the character's ASCII code to determine shape
+  return SHAPE_TYPES[code % SHAPE_TYPES.length];
+}
+
 export function processEmail(email: string) {
   const chars = email.toUpperCase().replace(/[^A-Z0-9@._\-+]/g, '').split('');
-  return chars.map((char, index) => ({
+  return chars.map((char) => ({
     char,
     color: '#ffffff',
-    shape: ['line-circle', 'concentric', 'spiral', 'triangle', 'cross'][index % 5] as string,
+    shape: getShapeForChar(char),
     pattern: 'cave-art',
-    rotation: (index * 45) % 360,
+    rotation: (char.charCodeAt(0) * 37) % 360,
   }));
+}
+
+// Simple email validation
+export function isValidEmail(email: string): boolean {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email.trim());
 }
 
 export function generateAvatarCanvas(email: string, size: number = 256, background: BackgroundType = 'cosmos'): HTMLCanvasElement {
