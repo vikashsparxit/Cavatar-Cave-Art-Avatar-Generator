@@ -488,10 +488,11 @@ export function generateAvatarCanvas(email: string, size: number = 256, backgrou
     ctx.globalAlpha = 0.08;
     ctx.strokeStyle = lineColor;
     ctx.lineWidth = size * 0.008;
-    ctx.font = `bold ${size * 0.9}px Arial, sans-serif`;
+    ctx.font = `bold ${size * 0.85}px Arial, sans-serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.strokeText(firstLetter, size / 2, size / 2);
+    // Slight vertical adjustment for optical centering
+    ctx.strokeText(firstLetter, size / 2, size / 2 + size * 0.02);
     ctx.restore();
   }
   
@@ -564,7 +565,8 @@ export function generateAvatarSVG(email: string, size: number = 256, background:
   // Add first letter silhouette (outline only)
   const firstLetter = getFirstLetter(email);
   if (firstLetter) {
-    shapes += `<text x="${size / 2}" y="${size / 2}" font-family="Arial, sans-serif" font-size="${size * 0.9}" font-weight="bold" fill="none" stroke="${lineColor}" stroke-width="${size * 0.008}" opacity="0.08" text-anchor="middle" dominant-baseline="central">${firstLetter}</text>`;
+    // dy attribute for optical vertical centering
+    shapes += `<text x="${size / 2}" y="${size / 2}" dy="0.35em" font-family="Arial, sans-serif" font-size="${size * 0.85}" font-weight="bold" fill="none" stroke="${lineColor}" stroke-width="${size * 0.008}" opacity="0.08" text-anchor="middle">${firstLetter}</text>`;
   }
   
   // Generate layers and convert to SVG
