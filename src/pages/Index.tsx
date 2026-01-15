@@ -141,8 +141,12 @@ with open('avatar.png', 'wb') as f:
               </div>
               
               <h1 className="text-5xl lg:text-6xl font-bold font-display leading-tight">
-                <span className="gradient-text">Cave Art Avatars</span> from Email
+                <span className="gradient-text">Connect to Your Roots</span>
               </h1>
+              
+              <p className="text-2xl lg:text-3xl font-display text-foreground/80 -mt-2">
+                Generate your cave art avatar from email
+              </p>
               
               <p className="text-xl text-muted-foreground leading-relaxed max-w-lg">
                 Every character in an email address maps to a unique design element. 
