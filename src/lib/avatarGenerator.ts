@@ -484,75 +484,60 @@ export function generateAvatarCanvas(email: string, size: number = 256, backgrou
   // Draw first letter silhouette with crosshatch pattern (blueprint aesthetic)
   const firstLetter = getFirstLetter(email);
   if (firstLetter) {
-    ctx.save();
-    ctx.font = `bold ${size * 0.85}px Arial, sans-serif`;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
     const textX = size / 2;
     const textY = size / 2 + size * 0.02;
     
-    // Fill the letter with cave color (base visibility)
-    ctx.globalAlpha = 0.10;
-    ctx.fillStyle = lineColor;
-    ctx.fillText(firstLetter, textX, textY);
+    // Create offscreen canvas for the letter with crosshatch
+    const letterCanvas = document.createElement('canvas');
+    letterCanvas.width = size;
+    letterCanvas.height = size;
+    const letterCtx = letterCanvas.getContext('2d')!;
     
-    // Create clipping path from the letter shape
-    ctx.save();
-    ctx.beginPath();
-    ctx.rect(0, 0, size, size);
-    ctx.clip();
+    // Draw the letter as a solid mask first
+    letterCtx.font = `bold ${size * 0.85}px Arial, sans-serif`;
+    letterCtx.textAlign = 'center';
+    letterCtx.textBaseline = 'middle';
+    letterCtx.fillStyle = lineColor;
+    letterCtx.fillText(firstLetter, textX, textY);
     
-    // Use the letter as a clipping mask for crosshatch
-    ctx.beginPath();
-    ctx.font = `bold ${size * 0.85}px Arial, sans-serif`;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    
-    // Create text path for clipping (using fill to define the region)
-    const tempCanvas = document.createElement('canvas');
-    tempCanvas.width = size;
-    tempCanvas.height = size;
-    const tempCtx = tempCanvas.getContext('2d')!;
-    tempCtx.font = `bold ${size * 0.85}px Arial, sans-serif`;
-    tempCtx.textAlign = 'center';
-    tempCtx.textBaseline = 'middle';
-    tempCtx.fillStyle = 'black';
-    tempCtx.fillText(firstLetter, textX, textY);
-    
-    // Draw diagonal crosshatch lines clipped to letter shape
-    ctx.globalAlpha = 0.15;
-    ctx.strokeStyle = lineColor;
-    ctx.lineWidth = Math.max(1, size * 0.006);
+    // Now draw crosshatch ONLY where the letter pixels exist
+    letterCtx.globalCompositeOperation = 'source-in';
+    letterCtx.strokeStyle = lineColor;
+    letterCtx.lineWidth = Math.max(1, size * 0.006);
     
     const lineSpacing = Math.max(4, size * 0.035);
     const diagonal = size * 1.5;
     
-    // Draw lines and use composite operation to clip to letter
-    ctx.globalCompositeOperation = 'source-atop';
-    
     // Diagonal lines from top-left to bottom-right
     for (let i = -diagonal; i < diagonal; i += lineSpacing) {
-      ctx.beginPath();
-      ctx.moveTo(i, 0);
-      ctx.lineTo(i + size, size);
-      ctx.stroke();
+      letterCtx.beginPath();
+      letterCtx.moveTo(i, 0);
+      letterCtx.lineTo(i + size, size);
+      letterCtx.stroke();
     }
     
     // Diagonal lines from top-right to bottom-left
     for (let i = -diagonal; i < diagonal; i += lineSpacing) {
-      ctx.beginPath();
-      ctx.moveTo(size - i, 0);
-      ctx.lineTo(-i, size);
-      ctx.stroke();
+      letterCtx.beginPath();
+      letterCtx.moveTo(size - i, 0);
+      letterCtx.lineTo(-i, size);
+      letterCtx.stroke();
     }
     
-    ctx.globalCompositeOperation = 'source-over';
+    // Draw the crosshatched letter onto main canvas with transparency
+    ctx.save();
+    ctx.globalAlpha = 0.18;
+    ctx.drawImage(letterCanvas, 0, 0);
     ctx.restore();
     
     // Stroke/border for definition
+    ctx.save();
     ctx.globalAlpha = 0.12;
     ctx.strokeStyle = lineColor;
     ctx.lineWidth = size * 0.012;
+    ctx.font = `bold ${size * 0.85}px Arial, sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
     ctx.strokeText(firstLetter, textX, textY);
     ctx.restore();
   }
