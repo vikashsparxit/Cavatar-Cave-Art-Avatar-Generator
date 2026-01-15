@@ -15,8 +15,8 @@
 - 🖼️ **Multiple Formats** - Export as PNG, WEBP, or SVG
 - 📐 **Flexible Sizes** - 128px, 256px, 512px (or any custom size)
 - 🌌 **Background Options** - Cosmos (dark), White, or custom hex colors
-- ⭕ **Shape Variants** - Rounded square or circular avatars
-- ✏️ **Blueprint Letter** - Crosshatched first-letter silhouette for recognition at small sizes
+- ⭕ **Shape Variants** - Rounded square, circle, or triangle avatars
+- 🎯 **Smart Containment** - All elements automatically fit within any avatar shape
 - ⚡ **Client-Side** - No server required, works entirely in the browser
 
 ## 🚀 Quick Start
@@ -42,10 +42,10 @@ import { generateAvatarDataURL, generateAvatarSVG } from './lib/avatarGenerator'
 
 // Generate PNG/WEBP data URL
 const pngUrl = generateAvatarDataURL('user@example.com', 256, 'cosmos', 'circle', 'png');
-const webpUrl = generateAvatarDataURL('user@example.com', 256, 'cosmos', 'circle', 'webp', 0.9);
+const webpUrl = generateAvatarDataURL('user@example.com', 256, 'cosmos', 'triangle', 'webp', 0.9);
 
 // Generate SVG string
-const svgString = generateAvatarSVG('user@example.com', 256, 'cosmos', 'rounded');
+const svgString = generateAvatarSVG('user@example.com', 256, 'cosmos', 'triangle');
 
 // Use in an img tag
 <img src={pngUrl} alt="User Avatar" />
@@ -58,7 +58,7 @@ const svgString = generateAvatarSVG('user@example.com', 256, 'cosmos', 'rounded'
 | `email` | `string` | required | Email address to generate avatar from |
 | `size` | `number` | `256` | Avatar dimensions in pixels |
 | `background` | `'cosmos' \| 'white' \| string` | `'cosmos'` | Background style or hex color |
-| `shape` | `'rounded' \| 'circle'` | `'rounded'` | Avatar shape |
+| `shape` | `'rounded' \| 'circle' \| 'triangle'` | `'rounded'` | Avatar shape |
 | `format` | `'png' \| 'webp' \| 'jpeg'` | `'png'` | Image format (for DataURL) |
 | `quality` | `number` | `0.92` | Compression quality for WEBP/JPEG (0-1) |
 
