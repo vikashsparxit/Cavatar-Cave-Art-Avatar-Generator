@@ -1,6 +1,13 @@
 // Cave art / petroglyphic style avatar generation with white line drawings
 
 export type BackgroundType = 'cosmos' | 'white' | string;
+export type AvatarShape = 'rounded' | 'circle';
+
+// Extract first alphabetic character from email for silhouette
+function getFirstLetter(email: string): string {
+  const match = email.match(/[a-zA-Z]/);
+  return match ? match[0].toUpperCase() : '';
+}
 
 function hashString(str: string): number {
   let hash = 5381;
@@ -417,7 +424,7 @@ export function isValidEmail(email: string): boolean {
   return emailRegex.test(email.trim());
 }
 
-export function generateAvatarCanvas(email: string, size: number = 256, background: BackgroundType = 'cosmos'): HTMLCanvasElement {
+export function generateAvatarCanvas(email: string, size: number = 256, background: BackgroundType = 'cosmos', shape: AvatarShape = 'rounded'): HTMLCanvasElement {
   const canvas = document.createElement('canvas');
   canvas.width = size;
   canvas.height = size;
@@ -474,27 +481,44 @@ export function generateAvatarCanvas(email: string, size: number = 256, backgrou
     ctx.fillRect(0, 0, size, size);
   }
   
+  // Draw first letter silhouette (subtle watermark behind elements)
+  const firstLetter = getFirstLetter(email);
+  if (firstLetter) {
+    ctx.save();
+    ctx.globalAlpha = 0.12;
+    ctx.fillStyle = lineColor;
+    ctx.font = `bold ${size * 0.75}px Arial, sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(firstLetter, size / 2, size / 2);
+    ctx.restore();
+  }
+  
   // Generate and draw layers
   const layers = generateLayers(email, size);
   layers.forEach(layer => drawLayer(ctx, layer, lineColor));
   
-  // Rounded corners mask
+  // Shape mask (rounded or circle)
   ctx.globalCompositeOperation = 'destination-in';
   ctx.beginPath();
-  const radius = size * 0.15;
-  ctx.roundRect(0, 0, size, size, radius);
+  if (shape === 'circle') {
+    ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
+  } else {
+    const radius = size * 0.15;
+    ctx.roundRect(0, 0, size, size, radius);
+  }
   ctx.fill();
   ctx.globalCompositeOperation = 'source-over';
   
   return canvas;
 }
 
-export function generateAvatarDataURL(email: string, size: number = 256, background: BackgroundType = 'cosmos'): string {
-  const canvas = generateAvatarCanvas(email, size, background);
+export function generateAvatarDataURL(email: string, size: number = 256, background: BackgroundType = 'cosmos', shape: AvatarShape = 'rounded'): string {
+  const canvas = generateAvatarCanvas(email, size, background, shape);
   return canvas.toDataURL('image/png');
 }
 
-export function generateAvatarSVG(email: string, size: number = 256, background: BackgroundType = 'cosmos'): string {
+export function generateAvatarSVG(email: string, size: number = 256, background: BackgroundType = 'cosmos', shape: AvatarShape = 'rounded'): string {
   const hash = hashString(email);
   const rand = seededRandom(hash);
   const lineColor = getLineColor(background);
@@ -534,6 +558,12 @@ export function generateAvatarSVG(email: string, size: number = 256, background:
     bgRect = `<rect width="${size}" height="${size}" fill="url(#bgGrad)"/>`;
   } else {
     bgRect = `<rect width="${size}" height="${size}" fill="${background}"/>`;
+  }
+  
+  // Add first letter silhouette
+  const firstLetter = getFirstLetter(email);
+  if (firstLetter) {
+    shapes += `<text x="${size / 2}" y="${size / 2}" font-family="Arial, sans-serif" font-size="${size * 0.75}" font-weight="bold" fill="${lineColor}" opacity="0.12" text-anchor="middle" dominant-baseline="central">${firstLetter}</text>`;
   }
   
   // Generate layers and convert to SVG
@@ -656,14 +686,19 @@ export function generateAvatarSVG(email: string, size: number = 256, background:
     }
   });
   
+  // Clip path based on shape
+  const clipPathDef = shape === 'circle'
+    ? `<circle cx="${size / 2}" cy="${size / 2}" r="${size / 2}"/>`
+    : `<rect width="${size}" height="${size}" rx="${size * 0.15}" ry="${size * 0.15}"/>`;
+  
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
     <defs>
       ${bgDefs}
-      <clipPath id="rounded">
-        <rect width="${size}" height="${size}" rx="${size * 0.15}" ry="${size * 0.15}"/>
+      <clipPath id="avatarClip">
+        ${clipPathDef}
       </clipPath>
     </defs>
-    <g clip-path="url(#rounded)">
+    <g clip-path="url(#avatarClip)">
       ${bgRect}
       ${shapes}
     </g>

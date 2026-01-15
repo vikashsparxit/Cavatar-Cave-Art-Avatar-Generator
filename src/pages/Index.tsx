@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Mail, Download, Copy, Check, Sparkles, Code2, Zap, Palette, AlertCircle, FileImage, FileCode, BookOpen } from "lucide-react";
+import { Mail, Download, Copy, Check, Sparkles, Code2, Zap, Palette, AlertCircle, FileImage, FileCode, BookOpen, Circle, Square } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AvatarPreview } from "@/components/AvatarPreview";
 import { CharacterBreakdown } from "@/components/CharacterBreakdown";
 import { CodeExample } from "@/components/CodeExample";
-import { generateAvatarDataURL, generateAvatarSVG, BackgroundType, isValidEmail } from "@/lib/avatarGenerator";
+import { generateAvatarDataURL, generateAvatarSVG, BackgroundType, AvatarShape, isValidEmail } from "@/lib/avatarGenerator";
 
 const DEMO_EMAILS = [
   "vikashshingh@gmail.com",
@@ -25,6 +25,7 @@ const Index = () => {
   const [bgOption, setBgOption] = useState<BackgroundOption>('cosmos');
   const [customColor, setCustomColor] = useState('#6366f1');
   const [selectedSize, setSelectedSize] = useState<SizeOption>(256);
+  const [selectedShape, setSelectedShape] = useState<AvatarShape>('rounded');
   const [emailError, setEmailError] = useState<string | null>(null);
 
   // Validate email when it changes
@@ -55,7 +56,7 @@ const Index = () => {
       setEmailError("Please enter a valid email address");
       return;
     }
-    const dataUrl = generateAvatarDataURL(email, selectedSize, getBackground());
+    const dataUrl = generateAvatarDataURL(email, selectedSize, getBackground(), selectedShape);
     const link = document.createElement("a");
     link.download = `avatar-${email.split("@")[0]}-${selectedSize}px.png`;
     link.href = dataUrl;
@@ -67,7 +68,7 @@ const Index = () => {
       setEmailError("Please enter a valid email address");
       return;
     }
-    const svgContent = generateAvatarSVG(email, selectedSize, getBackground());
+    const svgContent = generateAvatarSVG(email, selectedSize, getBackground(), selectedShape);
     const blob = new Blob([svgContent], { type: 'image/svg+xml' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -83,17 +84,17 @@ const Index = () => {
       return;
     }
     const bgParam = bgOption === 'custom' ? encodeURIComponent(customColor) : bgOption;
-    const url = `https://api.avatargen.io/v1/avatar?email=${encodeURIComponent(email)}&size=${selectedSize}&background=${bgParam}`;
+    const url = `https://api.avatargen.io/v1/avatar?email=${encodeURIComponent(email)}&size=${selectedSize}&background=${bgParam}&shape=${selectedShape}`;
     await navigator.clipboard.writeText(url);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
   const bgParam = bgOption === 'custom' ? customColor : bgOption;
-  const curlExample = `curl "https://api.avatargen.io/v1/avatar?email=${email}&size=${selectedSize}&format=png&background=${bgParam}" -o avatar.png`;
+  const curlExample = `curl "https://api.avatargen.io/v1/avatar?email=${email}&size=${selectedSize}&format=png&background=${bgParam}&shape=${selectedShape}" -o avatar.png`;
 
   const jsExample = `const email = '${email}';
-const avatarUrl = \`https://api.avatargen.io/v1/avatar?email=\${encodeURIComponent(email)}&size=${selectedSize}&background=${bgParam}\`;
+const avatarUrl = \`https://api.avatargen.io/v1/avatar?email=\${encodeURIComponent(email)}&size=${selectedSize}&background=${bgParam}&shape=${selectedShape}\`;
 
 // Use in img tag
 <img src={avatarUrl} alt="User Avatar" />`;
@@ -101,7 +102,7 @@ const avatarUrl = \`https://api.avatargen.io/v1/avatar?email=\${encodeURICompone
   const pythonExample = `import requests
 
 email = '${email}'
-url = f'https://api.avatargen.io/v1/avatar?email={email}&size=${selectedSize}&format=png&background=${bgParam}'
+url = f'https://api.avatargen.io/v1/avatar?email={email}&size=${selectedSize}&format=png&background=${bgParam}&shape=${selectedShape}'
 response = requests.get(url)
 
 with open('avatar.png', 'wb') as f:
@@ -346,6 +347,37 @@ with open('avatar.png', 'wb') as f:
                   </div>
                 </div>
 
+                {/* Shape selector */}
+                <div className="space-y-3">
+                  <label className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
+                    Shape
+                  </label>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setSelectedShape('rounded')}
+                      className={`flex-1 h-10 rounded-lg font-medium text-sm transition-all flex items-center justify-center gap-2 ${
+                        selectedShape === 'rounded'
+                          ? 'bg-primary text-primary-foreground shadow-md'
+                          : 'bg-muted hover:bg-muted/80 text-muted-foreground'
+                      }`}
+                    >
+                      <Square className="w-4 h-4" />
+                      Rounded
+                    </button>
+                    <button
+                      onClick={() => setSelectedShape('circle')}
+                      className={`flex-1 h-10 rounded-lg font-medium text-sm transition-all flex items-center justify-center gap-2 ${
+                        selectedShape === 'circle'
+                          ? 'bg-primary text-primary-foreground shadow-md'
+                          : 'bg-muted hover:bg-muted/80 text-muted-foreground'
+                      }`}
+                    >
+                      <Circle className="w-4 h-4" />
+                      Circle
+                    </button>
+                  </div>
+                </div>
+
                 {/* Action buttons */}
                 <div className="flex gap-3">
                   <Button 
@@ -396,9 +428,9 @@ with open('avatar.png', 'wb') as f:
                 className="flex flex-col items-center gap-6"
               >
                 {isEmailValid ? (
-                  <AvatarPreview email={email} size={320} background={getBackground()} className="shadow-avatar" />
+                  <AvatarPreview email={email} size={320} background={getBackground()} shape={selectedShape} className="shadow-avatar" />
                 ) : (
-                  <div className="w-[320px] h-[320px] rounded-xl bg-muted/50 border border-border flex items-center justify-center">
+                  <div className={`w-[320px] h-[320px] ${selectedShape === 'circle' ? 'rounded-full' : 'rounded-xl'} bg-muted/50 border border-border flex items-center justify-center`}>
                     <p className="text-muted-foreground text-sm">Enter a valid email</p>
                   </div>
                 )}
