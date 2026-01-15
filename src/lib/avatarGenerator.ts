@@ -1,29 +1,4 @@
-// Advanced avatar generation with cosmic/nebula artistic compositions
-
-// Rich, saturated color palettes - vibrant cores with darker variants
-const CHARACTER_PALETTES: Record<string, string[]> = {
-  'A': ['#FF4444', '#CC2222', '#881111'], 'B': ['#00D9B5', '#009E7F', '#006B55'],
-  'C': ['#00B4D8', '#0077B6', '#004D73'], 'D': ['#2DD4BF', '#0D9488', '#065F5B'],
-  'E': ['#FBBF24', '#D97706', '#92400E'], 'F': ['#E879F9', '#C026D3', '#7E22CE'],
-  'G': ['#34D399', '#059669', '#065F46'], 'H': ['#FCD34D', '#F59E0B', '#B45309'],
-  'I': ['#A78BFA', '#7C3AED', '#5B21B6'], 'J': ['#38BDF8', '#0284C7', '#075985'],
-  'K': ['#FB923C', '#EA580C', '#9A3412'], 'L': ['#4ADE80', '#16A34A', '#166534'],
-  'M': ['#F87171', '#DC2626', '#991B1B'], 'N': ['#94A3B8', '#64748B', '#475569'],
-  'O': ['#2DD4BF', '#14B8A6', '#0F766E'], 'P': ['#FB7185', '#E11D48', '#9F1239'],
-  'Q': ['#C084FC', '#9333EA', '#6B21A8'], 'R': ['#60A5FA', '#2563EB', '#1E40AF'],
-  'S': ['#5EEAD4', '#14B8A6', '#0D9488'], 'T': ['#FDE047', '#EAB308', '#A16207'],
-  'U': ['#F472B6', '#DB2777', '#9D174D'], 'V': ['#7DD3FC', '#0EA5E9', '#0369A1'],
-  'W': ['#6EE7B7', '#10B981', '#047857'], 'X': ['#FEF08A', '#FACC15', '#CA8A04'],
-  'Y': ['#D8B4FE', '#A855F7', '#7E22CE'], 'Z': ['#93C5FD', '#3B82F6', '#1D4ED8'],
-  '0': ['#FF7849', '#EA580C', '#C2410C'], '1': ['#FF5722', '#D84315', '#BF360C'],
-  '2': ['#00BCD4', '#0097A7', '#00838F'], '3': ['#00E676', '#00C853', '#00A044'],
-  '4': ['#7C4DFF', '#651FFF', '#4A148C'], '5': ['#FF4081', '#F50057', '#C51162'],
-  '6': ['#448AFF', '#2979FF', '#2962FF'], '7': ['#E040FB', '#D500F9', '#AA00FF'],
-  '8': ['#00E676', '#00C853', '#009624'], '9': ['#FF4081', '#F50057', '#AD1457'],
-  '@': ['#7C4DFF', '#536DFE', '#3D5AFE'], '.': ['#E040FB', '#AA00FF', '#7B1FA2'],
-  '_': ['#00BFA5', '#00897B', '#00695C'], '-': ['#FF6E40', '#FF3D00', '#DD2C00'],
-  '+': ['#69F0AE', '#00E676', '#00C853'],
-};
+// Cave art / petroglyphic style avatar generation with white line drawings
 
 function hashString(str: string): number {
   let hash = 5381;
@@ -41,19 +16,14 @@ function seededRandom(seed: number): () => number {
 }
 
 interface LayerElement {
-  type: 'nebula' | 'glow-orb' | 'ring' | 'crystal' | 'star' | 'arc';
+  type: 'line-circle' | 'concentric' | 'spiral' | 'triangle' | 'cross' | 'dots' | 'wavy-line' | 'connection';
   x: number;
   y: number;
   size: number;
   rotation: number;
-  colors: string[];
   opacity: number;
-  blur: number;
-}
-
-function getCharacterPalette(char: string): string[] {
-  const upper = char.toUpperCase();
-  return CHARACTER_PALETTES[upper] || ['#8B5CF6', '#7C3AED', '#5B21B6'];
+  strokeWidth: number;
+  variant?: number;
 }
 
 function generateLayers(email: string, size: number): LayerElement[] {
@@ -63,339 +33,342 @@ function generateLayers(email: string, size: number): LayerElement[] {
   const layers: LayerElement[] = [];
   const center = size / 2;
   
-  // Corner angles for placing elements towards corners
   const cornerAngles = [Math.PI * 0.25, Math.PI * 0.75, Math.PI * 1.25, Math.PI * 1.75];
   
-  // ===== ZONE 1: LARGE CORNER NEBULAE (fill corners with color presence) =====
+  // ===== ZONE 1: CORNER CONCENTRIC CIRCLES =====
   for (let i = 0; i < 4; i++) {
-    const charIndex = i % chars.length;
-    const palette = getCharacterPalette(chars[charIndex] || 'A');
     const angle = cornerAngles[i] + (rand() - 0.5) * 0.3;
-    const distance = size * 0.38 + rand() * size * 0.12;
+    const distance = size * 0.32 + rand() * size * 0.08;
     
     layers.push({
-      type: 'nebula',
+      type: 'concentric',
       x: center + Math.cos(angle) * distance,
       y: center + Math.sin(angle) * distance,
-      size: size * 0.5 + rand() * size * 0.2,
+      size: size * 0.12 + rand() * size * 0.08,
       rotation: rand() * 360,
-      colors: palette,
-      opacity: 0.25 + rand() * 0.15,
-      blur: size * 0.1,
-    });
-  }
-  
-  // ===== ZONE 2: EXTENDED RINGS (reach towards edges) =====
-  const numRings = 2 + Math.floor(rand() * 2);
-  const ringRadii = [0.28, 0.42, 0.56]; // Much larger rings
-  for (let i = 0; i < numRings; i++) {
-    const charIndex = (i * 3) % chars.length;
-    const palette = getCharacterPalette(chars[charIndex] || 'C');
-    
-    layers.push({
-      type: 'ring',
-      x: center,
-      y: center,
-      size: size * ringRadii[i % ringRadii.length],
-      rotation: rand() * 360,
-      colors: palette,
       opacity: 0.5 + rand() * 0.3,
-      blur: 0,
+      strokeWidth: 1.5 + rand() * 1,
+      variant: 2 + Math.floor(rand() * 2),
     });
   }
   
-  // ===== ZONE 3: PRIMARY ORBS (wider spread, bigger) =====
-  const numOrbs = 4 + Math.floor(rand() * 2);
-  for (let i = 0; i < numOrbs; i++) {
-    const charIndex = (i * 2) % chars.length;
-    const palette = getCharacterPalette(chars[charIndex] || 'B');
-    const angle = (i / numOrbs) * Math.PI * 2 + rand() * 0.5;
-    const distance = size * 0.1 + rand() * size * 0.28; // Extended: 10-38%
+  // ===== ZONE 2: PRIMARY LINE CIRCLES =====
+  const numCircles = 3 + Math.floor(rand() * 2);
+  for (let i = 0; i < numCircles; i++) {
+    const angle = (i / numCircles) * Math.PI * 2 + rand() * 0.5;
+    const distance = size * 0.08 + rand() * size * 0.2;
     
     layers.push({
-      type: 'glow-orb',
+      type: 'line-circle',
       x: center + Math.cos(angle) * distance,
       y: center + Math.sin(angle) * distance,
-      size: size * 0.10 + rand() * size * 0.12, // Bigger: 10-22%
+      size: size * 0.06 + rand() * size * 0.08,
       rotation: rand() * 360,
-      colors: palette,
-      opacity: 0.85 + rand() * 0.15,
-      blur: size * 0.02,
+      opacity: 0.7 + rand() * 0.3,
+      strokeWidth: 1.5 + rand() * 1.5,
     });
   }
   
-  // ===== ZONE 4: EDGE ARCS (sweeping to outer zones) =====
-  const numArcs = 2 + Math.floor(rand() * 2);
-  for (let i = 0; i < numArcs; i++) {
-    const charIndex = Math.floor(rand() * chars.length);
-    const palette = getCharacterPalette(chars[charIndex] || 'D');
-    
-    layers.push({
-      type: 'arc',
-      x: center,
-      y: center,
-      size: size * 0.32 + i * size * 0.12, // Extended: 32-56%
-      rotation: (i * 90) + rand() * 60,
-      colors: palette,
-      opacity: 0.6 + rand() * 0.25,
-      blur: size * 0.005,
-    });
-  }
-  
-  // ===== ZONE 5: CRYSTALS (mid to outer zone) =====
-  const numCrystals = Math.min(chars.length, 5);
-  for (let i = 0; i < numCrystals; i++) {
-    const palette = getCharacterPalette(chars[i]);
-    const angle = (i / numCrystals) * Math.PI * 2 + rand() * 0.4;
-    const distance = size * 0.18 + rand() * size * 0.22; // Extended: 18-40%
-    
-    layers.push({
-      type: 'crystal',
-      x: center + Math.cos(angle) * distance,
-      y: center + Math.sin(angle) * distance,
-      size: size * 0.05 + rand() * size * 0.045,
-      rotation: (angle * 180 / Math.PI) + rand() * 20,
-      colors: palette,
-      opacity: 0.9 + rand() * 0.1,
-      blur: 0,
-    });
-  }
-  
-  // ===== ZONE 6: CORNER ACCENT ORBS (small decorative elements in corners) =====
-  for (let i = 0; i < 4; i++) {
-    const charIndex = (i + 4) % chars.length;
-    const palette = getCharacterPalette(chars[charIndex] || 'F');
-    const angle = cornerAngles[i] + (rand() - 0.5) * 0.5;
-    const distance = size * 0.32 + rand() * size * 0.10;
-    
-    layers.push({
-      type: 'glow-orb',
-      x: center + Math.cos(angle) * distance,
-      y: center + Math.sin(angle) * distance,
-      size: size * 0.04 + rand() * size * 0.03, // Small accent orbs
-      rotation: rand() * 360,
-      colors: palette,
-      opacity: 0.75 + rand() * 0.2,
-      blur: size * 0.01,
-    });
-  }
-  
-  // ===== ZONE 7: SCATTERED STARS (full canvas coverage) =====
-  const numStars = 8 + Math.floor(rand() * 5);
-  for (let i = 0; i < numStars; i++) {
-    const charIndex = Math.floor(rand() * chars.length);
-    const palette = getCharacterPalette(chars[charIndex] || 'E');
+  // ===== ZONE 3: SPIRALS =====
+  const numSpirals = 1 + Math.floor(rand() * 2);
+  for (let i = 0; i < numSpirals; i++) {
     const angle = rand() * Math.PI * 2;
-    const distance = size * 0.05 + rand() * size * 0.42; // Full spread: 5-47%
+    const distance = size * 0.15 + rand() * size * 0.15;
     
     layers.push({
-      type: 'star',
+      type: 'spiral',
       x: center + Math.cos(angle) * distance,
       y: center + Math.sin(angle) * distance,
-      size: size * 0.012 + rand() * size * 0.018,
+      size: size * 0.08 + rand() * size * 0.06,
       rotation: rand() * 360,
-      colors: palette,
-      opacity: 0.7 + rand() * 0.25,
-      blur: size * 0.003,
+      opacity: 0.6 + rand() * 0.3,
+      strokeWidth: 1.5 + rand() * 1,
+      variant: rand() > 0.5 ? 1 : -1, // clockwise or counter
+    });
+  }
+  
+  // ===== ZONE 4: TRIANGLES =====
+  const numTriangles = 2 + Math.floor(rand() * 2);
+  for (let i = 0; i < numTriangles; i++) {
+    const charIndex = i % chars.length;
+    const angle = (i / numTriangles) * Math.PI * 2 + rand() * 0.8;
+    const distance = size * 0.2 + rand() * size * 0.18;
+    
+    layers.push({
+      type: 'triangle',
+      x: center + Math.cos(angle) * distance,
+      y: center + Math.sin(angle) * distance,
+      size: size * 0.04 + rand() * size * 0.04,
+      rotation: (charIndex * 60) + rand() * 40,
+      opacity: 0.7 + rand() * 0.3,
+      strokeWidth: 1.5 + rand() * 1,
+    });
+  }
+  
+  // ===== ZONE 5: CROSS MARKS =====
+  const numCrosses = 3 + Math.floor(rand() * 3);
+  for (let i = 0; i < numCrosses; i++) {
+    const angle = rand() * Math.PI * 2;
+    const distance = size * 0.1 + rand() * size * 0.35;
+    
+    layers.push({
+      type: 'cross',
+      x: center + Math.cos(angle) * distance,
+      y: center + Math.sin(angle) * distance,
+      size: size * 0.02 + rand() * size * 0.025,
+      rotation: rand() * 45,
+      opacity: 0.5 + rand() * 0.4,
+      strokeWidth: 1 + rand() * 1,
+    });
+  }
+  
+  // ===== ZONE 6: DOT CLUSTERS =====
+  const numDotClusters = 2 + Math.floor(rand() * 2);
+  for (let i = 0; i < numDotClusters; i++) {
+    const angle = rand() * Math.PI * 2;
+    const distance = size * 0.15 + rand() * size * 0.25;
+    
+    layers.push({
+      type: 'dots',
+      x: center + Math.cos(angle) * distance,
+      y: center + Math.sin(angle) * distance,
+      size: size * 0.04 + rand() * size * 0.03,
+      rotation: rand() * 360,
+      opacity: 0.6 + rand() * 0.4,
+      strokeWidth: 1,
+      variant: 3 + Math.floor(rand() * 3), // number of dots
+    });
+  }
+  
+  // ===== ZONE 7: WAVY LINES =====
+  const numWavyLines = 2 + Math.floor(rand() * 2);
+  for (let i = 0; i < numWavyLines; i++) {
+    const angle = (i / numWavyLines) * Math.PI * 2 + rand() * 0.5;
+    const distance = size * 0.2 + rand() * size * 0.15;
+    
+    layers.push({
+      type: 'wavy-line',
+      x: center + Math.cos(angle) * distance,
+      y: center + Math.sin(angle) * distance,
+      size: size * 0.1 + rand() * size * 0.1,
+      rotation: rand() * 360,
+      opacity: 0.5 + rand() * 0.3,
+      strokeWidth: 1 + rand() * 1,
+      variant: 2 + Math.floor(rand() * 2), // number of waves
+    });
+  }
+  
+  // ===== ZONE 8: CONNECTION LINES =====
+  const numConnections = 4 + Math.floor(rand() * 3);
+  for (let i = 0; i < numConnections; i++) {
+    const angle = rand() * Math.PI * 2;
+    const distance = size * 0.1 + rand() * size * 0.3;
+    
+    layers.push({
+      type: 'connection',
+      x: center + Math.cos(angle) * distance,
+      y: center + Math.sin(angle) * distance,
+      size: size * 0.08 + rand() * size * 0.12,
+      rotation: rand() * 360,
+      opacity: 0.3 + rand() * 0.3,
+      strokeWidth: 0.5 + rand() * 0.5,
     });
   }
   
   return layers;
 }
 
-function drawNebula(ctx: CanvasRenderingContext2D, layer: LayerElement): void {
-  const gradient = ctx.createRadialGradient(
-    layer.x, layer.y, 0,
-    layer.x, layer.y, layer.size / 2
-  );
-  // Fade from bright core to dark (not white)
-  gradient.addColorStop(0, layer.colors[0]);
-  gradient.addColorStop(0.4, layer.colors[1] + 'AA');
-  gradient.addColorStop(0.7, layer.colors[2] + '55');
-  gradient.addColorStop(1, 'transparent');
-  
+function drawLineCircle(ctx: CanvasRenderingContext2D, layer: LayerElement): void {
   ctx.save();
   ctx.globalAlpha = layer.opacity;
-  ctx.filter = `blur(${layer.blur}px)`;
-  ctx.fillStyle = gradient;
-  ctx.beginPath();
-  ctx.arc(layer.x, layer.y, layer.size / 2, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.restore();
-}
-
-function drawGlowOrb(ctx: CanvasRenderingContext2D, layer: LayerElement): void {
-  // Outer glow
-  const outerGlow = ctx.createRadialGradient(
-    layer.x, layer.y, 0,
-    layer.x, layer.y, layer.size * 1.5
-  );
-  outerGlow.addColorStop(0, layer.colors[0] + 'CC');
-  outerGlow.addColorStop(0.3, layer.colors[1] + '66');
-  outerGlow.addColorStop(0.6, layer.colors[2] + '22');
-  outerGlow.addColorStop(1, 'transparent');
-  
-  ctx.save();
-  ctx.globalAlpha = layer.opacity * 0.6;
-  ctx.filter = `blur(${layer.blur * 2}px)`;
-  ctx.fillStyle = outerGlow;
-  ctx.beginPath();
-  ctx.arc(layer.x, layer.y, layer.size * 1.5, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.restore();
-  
-  // Core orb
-  const coreGradient = ctx.createRadialGradient(
-    layer.x - layer.size * 0.2, layer.y - layer.size * 0.2, 0,
-    layer.x, layer.y, layer.size
-  );
-  coreGradient.addColorStop(0, layer.colors[0]);
-  coreGradient.addColorStop(0.5, layer.colors[1]);
-  coreGradient.addColorStop(1, layer.colors[2]);
-  
-  ctx.save();
-  ctx.globalAlpha = layer.opacity;
-  ctx.fillStyle = coreGradient;
+  ctx.strokeStyle = '#ffffff';
+  ctx.lineWidth = layer.strokeWidth;
+  ctx.lineCap = 'round';
   ctx.beginPath();
   ctx.arc(layer.x, layer.y, layer.size, 0, Math.PI * 2);
-  ctx.fill();
-  
-  // Subtle highlight (colored, not white)
-  const highlightGradient = ctx.createRadialGradient(
-    layer.x - layer.size * 0.3, layer.y - layer.size * 0.3, 0,
-    layer.x, layer.y, layer.size * 0.6
-  );
-  highlightGradient.addColorStop(0, layer.colors[0] + '80');
-  highlightGradient.addColorStop(1, 'transparent');
-  ctx.fillStyle = highlightGradient;
-  ctx.fill();
-  ctx.restore();
-}
-
-function drawRing(ctx: CanvasRenderingContext2D, layer: LayerElement): void {
-  ctx.save();
-  ctx.translate(layer.x, layer.y);
-  ctx.rotate((layer.rotation * Math.PI) / 180);
-  ctx.globalAlpha = layer.opacity;
-  
-  const gradient = ctx.createLinearGradient(-layer.size, 0, layer.size, 0);
-  gradient.addColorStop(0, 'transparent');
-  gradient.addColorStop(0.2, layer.colors[2] + '88');
-  gradient.addColorStop(0.5, layer.colors[0]);
-  gradient.addColorStop(0.8, layer.colors[1] + '88');
-  gradient.addColorStop(1, 'transparent');
-  
-  ctx.strokeStyle = gradient;
-  ctx.lineWidth = layer.size * 0.04;
-  ctx.lineCap = 'round';
-  ctx.shadowColor = layer.colors[0];
-  ctx.shadowBlur = layer.size * 0.05;
-  ctx.beginPath();
-  ctx.arc(0, 0, layer.size, 0, Math.PI * 1.6);
   ctx.stroke();
   ctx.restore();
 }
 
-function drawCrystal(ctx: CanvasRenderingContext2D, layer: LayerElement): void {
+function drawConcentric(ctx: CanvasRenderingContext2D, layer: LayerElement): void {
+  const rings = layer.variant || 3;
+  ctx.save();
+  ctx.globalAlpha = layer.opacity;
+  ctx.strokeStyle = '#ffffff';
+  ctx.lineWidth = layer.strokeWidth;
+  ctx.lineCap = 'round';
+  
+  for (let i = 0; i < rings; i++) {
+    const radius = layer.size * (0.4 + (i / rings) * 0.6);
+    ctx.beginPath();
+    ctx.arc(layer.x, layer.y, radius, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function drawSpiral(ctx: CanvasRenderingContext2D, layer: LayerElement): void {
   ctx.save();
   ctx.translate(layer.x, layer.y);
   ctx.rotate((layer.rotation * Math.PI) / 180);
   ctx.globalAlpha = layer.opacity;
+  ctx.strokeStyle = '#ffffff';
+  ctx.lineWidth = layer.strokeWidth;
+  ctx.lineCap = 'round';
+  
+  const direction = layer.variant || 1;
+  ctx.beginPath();
+  for (let angle = 0; angle < Math.PI * 4; angle += 0.1) {
+    const radius = (angle / (Math.PI * 4)) * layer.size;
+    const x = Math.cos(angle * direction) * radius;
+    const y = Math.sin(angle * direction) * radius;
+    if (angle === 0) {
+      ctx.moveTo(x, y);
+    } else {
+      ctx.lineTo(x, y);
+    }
+  }
+  ctx.stroke();
+  ctx.restore();
+}
+
+function drawTriangle(ctx: CanvasRenderingContext2D, layer: LayerElement): void {
+  ctx.save();
+  ctx.translate(layer.x, layer.y);
+  ctx.rotate((layer.rotation * Math.PI) / 180);
+  ctx.globalAlpha = layer.opacity;
+  ctx.strokeStyle = '#ffffff';
+  ctx.lineWidth = layer.strokeWidth;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
   
   const s = layer.size;
-  
-  // Outer glow
-  ctx.shadowColor = layer.colors[0];
-  ctx.shadowBlur = s * 0.5;
-  
-  const gradient = ctx.createLinearGradient(-s, -s, s, s);
-  gradient.addColorStop(0, layer.colors[0]);
-  gradient.addColorStop(0.5, layer.colors[1]);
-  gradient.addColorStop(1, layer.colors[2]);
-  
-  ctx.fillStyle = gradient;
   ctx.beginPath();
   ctx.moveTo(0, -s);
-  ctx.lineTo(s * 0.5, 0);
-  ctx.lineTo(0, s);
-  ctx.lineTo(-s * 0.5, 0);
+  ctx.lineTo(s * 0.866, s * 0.5);
+  ctx.lineTo(-s * 0.866, s * 0.5);
   ctx.closePath();
-  ctx.fill();
-  
-  // Inner facet highlight (colored)
-  const facetGradient = ctx.createLinearGradient(-s * 0.3, -s, s * 0.3, 0);
-  facetGradient.addColorStop(0, layer.colors[0] + '99');
-  facetGradient.addColorStop(1, 'transparent');
-  ctx.fillStyle = facetGradient;
-  ctx.beginPath();
-  ctx.moveTo(0, -s);
-  ctx.lineTo(s * 0.25, -s * 0.3);
-  ctx.lineTo(0, s * 0.2);
-  ctx.lineTo(-s * 0.15, -s * 0.2);
-  ctx.closePath();
-  ctx.fill();
-  
-  ctx.restore();
-}
-
-function drawArc(ctx: CanvasRenderingContext2D, layer: LayerElement): void {
-  ctx.save();
-  ctx.translate(layer.x, layer.y);
-  ctx.rotate((layer.rotation * Math.PI) / 180);
-  ctx.globalAlpha = layer.opacity;
-  
-  const gradient = ctx.createLinearGradient(0, -layer.size, 0, layer.size);
-  gradient.addColorStop(0, layer.colors[0]);
-  gradient.addColorStop(0.5, layer.colors[1] + 'CC');
-  gradient.addColorStop(1, 'transparent');
-  
-  ctx.strokeStyle = gradient;
-  ctx.lineWidth = layer.size * 0.08;
-  ctx.lineCap = 'round';
-  ctx.shadowColor = layer.colors[0];
-  ctx.shadowBlur = layer.size * 0.1;
-  ctx.beginPath();
-  ctx.arc(0, 0, layer.size, -Math.PI * 0.4, Math.PI * 0.4);
   ctx.stroke();
   ctx.restore();
 }
 
-function drawStar(ctx: CanvasRenderingContext2D, layer: LayerElement): void {
+function drawCross(ctx: CanvasRenderingContext2D, layer: LayerElement): void {
+  ctx.save();
+  ctx.translate(layer.x, layer.y);
+  ctx.rotate((layer.rotation * Math.PI) / 180);
+  ctx.globalAlpha = layer.opacity;
+  ctx.strokeStyle = '#ffffff';
+  ctx.lineWidth = layer.strokeWidth;
+  ctx.lineCap = 'round';
+  
+  const s = layer.size;
+  ctx.beginPath();
+  ctx.moveTo(-s, -s);
+  ctx.lineTo(s, s);
+  ctx.moveTo(s, -s);
+  ctx.lineTo(-s, s);
+  ctx.stroke();
+  ctx.restore();
+}
+
+function drawDots(ctx: CanvasRenderingContext2D, layer: LayerElement): void {
+  const numDots = layer.variant || 4;
+  const hash = hashString(`${layer.x}${layer.y}`);
+  const rand = seededRandom(hash);
+  
   ctx.save();
   ctx.globalAlpha = layer.opacity;
+  ctx.fillStyle = '#ffffff';
   
-  // Colored star glow (NOT white)
-  const gradient = ctx.createRadialGradient(
-    layer.x, layer.y, 0,
-    layer.x, layer.y, layer.size * 2
-  );
-  gradient.addColorStop(0, layer.colors[0]);
-  gradient.addColorStop(0.3, layer.colors[1] + 'AA');
-  gradient.addColorStop(0.6, layer.colors[2] + '44');
-  gradient.addColorStop(1, 'transparent');
+  const dotPositions: {x: number, y: number}[] = [];
   
-  ctx.fillStyle = gradient;
+  for (let i = 0; i < numDots; i++) {
+    const angle = (i / numDots) * Math.PI * 2 + rand() * 0.5;
+    const dist = layer.size * (0.3 + rand() * 0.7);
+    const dotX = layer.x + Math.cos(angle) * dist;
+    const dotY = layer.y + Math.sin(angle) * dist;
+    const dotSize = 1.5 + rand() * 1.5;
+    
+    dotPositions.push({x: dotX, y: dotY});
+    
+    ctx.beginPath();
+    ctx.arc(dotX, dotY, dotSize, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  
+  // Connect some dots with thin lines
+  ctx.strokeStyle = '#ffffff';
+  ctx.lineWidth = 0.5;
+  ctx.globalAlpha = layer.opacity * 0.5;
+  for (let i = 0; i < dotPositions.length - 1; i++) {
+    ctx.beginPath();
+    ctx.moveTo(dotPositions[i].x, dotPositions[i].y);
+    ctx.lineTo(dotPositions[i + 1].x, dotPositions[i + 1].y);
+    ctx.stroke();
+  }
+  
+  ctx.restore();
+}
+
+function drawWavyLine(ctx: CanvasRenderingContext2D, layer: LayerElement): void {
+  ctx.save();
+  ctx.translate(layer.x, layer.y);
+  ctx.rotate((layer.rotation * Math.PI) / 180);
+  ctx.globalAlpha = layer.opacity;
+  ctx.strokeStyle = '#ffffff';
+  ctx.lineWidth = layer.strokeWidth;
+  ctx.lineCap = 'round';
+  
+  const waves = layer.variant || 3;
+  const amplitude = layer.size * 0.2;
+  
   ctx.beginPath();
-  ctx.arc(layer.x, layer.y, layer.size * 2, 0, Math.PI * 2);
-  ctx.fill();
+  ctx.moveTo(-layer.size, 0);
   
-  // Bright core
-  ctx.fillStyle = layer.colors[0];
+  for (let x = -layer.size; x <= layer.size; x += 2) {
+    const progress = (x + layer.size) / (layer.size * 2);
+    const y = Math.sin(progress * Math.PI * 2 * waves) * amplitude;
+    ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+  ctx.restore();
+}
+
+function drawConnection(ctx: CanvasRenderingContext2D, layer: LayerElement): void {
+  const hash = hashString(`${layer.x}${layer.y}${layer.rotation}`);
+  const rand = seededRandom(hash);
+  
+  ctx.save();
+  ctx.translate(layer.x, layer.y);
+  ctx.rotate((layer.rotation * Math.PI) / 180);
+  ctx.globalAlpha = layer.opacity;
+  ctx.strokeStyle = '#ffffff';
+  ctx.lineWidth = layer.strokeWidth;
+  ctx.lineCap = 'round';
+  
+  // Draw a simple line with slight curve
+  const startX = -layer.size / 2;
+  const endX = layer.size / 2;
+  const curveY = (rand() - 0.5) * layer.size * 0.3;
+  
   ctx.beginPath();
-  ctx.arc(layer.x, layer.y, layer.size * 0.5, 0, Math.PI * 2);
-  ctx.fill();
+  ctx.moveTo(startX, 0);
+  ctx.quadraticCurveTo(0, curveY, endX, 0);
+  ctx.stroke();
   
   ctx.restore();
 }
 
 function drawLayer(ctx: CanvasRenderingContext2D, layer: LayerElement): void {
   switch (layer.type) {
-    case 'nebula': drawNebula(ctx, layer); break;
-    case 'glow-orb': drawGlowOrb(ctx, layer); break;
-    case 'ring': drawRing(ctx, layer); break;
-    case 'crystal': drawCrystal(ctx, layer); break;
-    case 'arc': drawArc(ctx, layer); break;
-    case 'star': drawStar(ctx, layer); break;
+    case 'line-circle': drawLineCircle(ctx, layer); break;
+    case 'concentric': drawConcentric(ctx, layer); break;
+    case 'spiral': drawSpiral(ctx, layer); break;
+    case 'triangle': drawTriangle(ctx, layer); break;
+    case 'cross': drawCross(ctx, layer); break;
+    case 'dots': drawDots(ctx, layer); break;
+    case 'wavy-line': drawWavyLine(ctx, layer); break;
+    case 'connection': drawConnection(ctx, layer); break;
   }
 }
 
@@ -403,9 +376,9 @@ export function processEmail(email: string) {
   const chars = email.toUpperCase().replace(/[^A-Z0-9@._\-+]/g, '').split('');
   return chars.map((char, index) => ({
     char,
-    color: getCharacterPalette(char)[0],
-    shape: ['glow-orb', 'crystal', 'ring', 'arc', 'star'][index % 5] as string,
-    pattern: 'cosmic',
+    color: '#ffffff',
+    shape: ['line-circle', 'concentric', 'spiral', 'triangle', 'cross'][index % 5] as string,
+    pattern: 'cave-art',
     rotation: (index * 45) % 360,
   }));
 }
@@ -419,7 +392,7 @@ export function generateAvatarCanvas(email: string, size: number = 256): HTMLCan
   const hash = hashString(email);
   const bgRand = seededRandom(hash + 999);
   
-  // Dark cosmos background with subtle gradient
+  // Dark cosmos background
   const bgGradient = ctx.createRadialGradient(
     size * 0.3, size * 0.3, 0,
     size / 2, size / 2, size * 0.9
@@ -431,13 +404,13 @@ export function generateAvatarCanvas(email: string, size: number = 256): HTMLCan
   ctx.fillStyle = bgGradient;
   ctx.fillRect(0, 0, size, size);
   
-  // Add subtle background stars
-  const numBgStars = 30 + Math.floor(bgRand() * 20);
+  // Add subtle background stars (tiny white dots)
+  const numBgStars = 40 + Math.floor(bgRand() * 30);
   for (let i = 0; i < numBgStars; i++) {
     const starX = bgRand() * size;
     const starY = bgRand() * size;
-    const starSize = 0.5 + bgRand() * 1.5;
-    const starOpacity = 0.2 + bgRand() * 0.4;
+    const starSize = 0.3 + bgRand() * 0.8;
+    const starOpacity = 0.15 + bgRand() * 0.25;
     
     ctx.save();
     ctx.globalAlpha = starOpacity;
@@ -469,49 +442,142 @@ export function generateAvatarDataURL(email: string, size: number = 256): string
 }
 
 export function generateAvatarSVG(email: string, size: number = 256): string {
-  const chars = email.toUpperCase().replace(/[^A-Z0-9@._\-+]/g, '').split('');
+  const hash = hashString(email);
+  const rand = seededRandom(hash);
   const center = size / 2;
   
   let shapes = '';
-  const numShapes = Math.min(chars.length, 6);
   
-  // Glowing orbs
-  for (let i = 0; i < numShapes; i++) {
-    const palette = getCharacterPalette(chars[i]);
-    const angle = (i / numShapes) * Math.PI * 2;
-    const distance = size * 0.2;
-    const x = center + Math.cos(angle) * distance;
-    const y = center + Math.sin(angle) * distance;
-    const shapeSize = size * 0.08;
+  // Background stars
+  const bgRand = seededRandom(hash + 999);
+  const numBgStars = 40 + Math.floor(bgRand() * 30);
+  for (let i = 0; i < numBgStars; i++) {
+    const starX = bgRand() * size;
+    const starY = bgRand() * size;
+    const starSize = 0.3 + bgRand() * 0.8;
+    const starOpacity = 0.15 + bgRand() * 0.25;
+    shapes += `<circle cx="${starX}" cy="${starY}" r="${starSize}" fill="#ffffff" opacity="${starOpacity}"/>`;
+  }
+  
+  // Generate layers and convert to SVG
+  const layers = generateLayers(email, size);
+  
+  layers.forEach(layer => {
+    const opacity = layer.opacity.toFixed(2);
+    const sw = layer.strokeWidth.toFixed(1);
     
-    shapes += `
-      <circle cx="${x}" cy="${y}" r="${shapeSize * 2}" fill="url(#glow${i})" opacity="0.4"/>
-      <circle cx="${x}" cy="${y}" r="${shapeSize}" fill="${palette[0]}"/>`;
-  }
-  
-  // Generate gradient defs
-  let gradientDefs = '';
-  for (let i = 0; i < numShapes; i++) {
-    const palette = getCharacterPalette(chars[i]);
-    gradientDefs += `
-      <radialGradient id="glow${i}">
-        <stop offset="0%" style="stop-color:${palette[0]}"/>
-        <stop offset="60%" style="stop-color:${palette[1]};stop-opacity:0.5"/>
-        <stop offset="100%" style="stop-color:${palette[2]};stop-opacity:0"/>
-      </radialGradient>`;
-  }
-  
-  // Generate background stars for SVG
-  let bgStars = '';
-  const svgRand = seededRandom(hashString(email) + 999);
-  const numSvgStars = 30 + Math.floor(svgRand() * 20);
-  for (let i = 0; i < numSvgStars; i++) {
-    const starX = svgRand() * size;
-    const starY = svgRand() * size;
-    const starSize = 0.5 + svgRand() * 1.5;
-    const starOpacity = 0.2 + svgRand() * 0.4;
-    bgStars += `<circle cx="${starX}" cy="${starY}" r="${starSize}" fill="#ffffff" opacity="${starOpacity}"/>`;
-  }
+    switch (layer.type) {
+      case 'line-circle':
+        shapes += `<circle cx="${layer.x}" cy="${layer.y}" r="${layer.size}" fill="none" stroke="#ffffff" stroke-width="${sw}" opacity="${opacity}" stroke-linecap="round"/>`;
+        break;
+        
+      case 'concentric':
+        const rings = layer.variant || 3;
+        for (let i = 0; i < rings; i++) {
+          const radius = layer.size * (0.4 + (i / rings) * 0.6);
+          shapes += `<circle cx="${layer.x}" cy="${layer.y}" r="${radius}" fill="none" stroke="#ffffff" stroke-width="${sw}" opacity="${opacity}" stroke-linecap="round"/>`;
+        }
+        break;
+        
+      case 'spiral':
+        let spiralPath = '';
+        const dir = layer.variant || 1;
+        for (let angle = 0; angle < Math.PI * 4; angle += 0.1) {
+          const r = (angle / (Math.PI * 4)) * layer.size;
+          const x = layer.x + Math.cos(angle * dir + layer.rotation * Math.PI / 180) * r;
+          const y = layer.y + Math.sin(angle * dir + layer.rotation * Math.PI / 180) * r;
+          spiralPath += (angle === 0 ? 'M' : 'L') + `${x.toFixed(1)},${y.toFixed(1)} `;
+        }
+        shapes += `<path d="${spiralPath}" fill="none" stroke="#ffffff" stroke-width="${sw}" opacity="${opacity}" stroke-linecap="round"/>`;
+        break;
+        
+      case 'triangle':
+        const s = layer.size;
+        const rot = layer.rotation * Math.PI / 180;
+        const points = [
+          [0, -s],
+          [s * 0.866, s * 0.5],
+          [-s * 0.866, s * 0.5]
+        ].map(([px, py]) => {
+          const rx = px * Math.cos(rot) - py * Math.sin(rot) + layer.x;
+          const ry = px * Math.sin(rot) + py * Math.cos(rot) + layer.y;
+          return `${rx.toFixed(1)},${ry.toFixed(1)}`;
+        }).join(' ');
+        shapes += `<polygon points="${points}" fill="none" stroke="#ffffff" stroke-width="${sw}" opacity="${opacity}" stroke-linecap="round" stroke-linejoin="round"/>`;
+        break;
+        
+      case 'cross':
+        const cs = layer.size;
+        const crot = layer.rotation * Math.PI / 180;
+        const crossLines = [
+          [[-cs, -cs], [cs, cs]],
+          [[cs, -cs], [-cs, cs]]
+        ];
+        crossLines.forEach(([[x1, y1], [x2, y2]]) => {
+          const rx1 = x1 * Math.cos(crot) - y1 * Math.sin(crot) + layer.x;
+          const ry1 = x1 * Math.sin(crot) + y1 * Math.cos(crot) + layer.y;
+          const rx2 = x2 * Math.cos(crot) - y2 * Math.sin(crot) + layer.x;
+          const ry2 = x2 * Math.sin(crot) + y2 * Math.cos(crot) + layer.y;
+          shapes += `<line x1="${rx1.toFixed(1)}" y1="${ry1.toFixed(1)}" x2="${rx2.toFixed(1)}" y2="${ry2.toFixed(1)}" stroke="#ffffff" stroke-width="${sw}" opacity="${opacity}" stroke-linecap="round"/>`;
+        });
+        break;
+        
+      case 'dots':
+        const numDots = layer.variant || 4;
+        const dotRand = seededRandom(hashString(`${layer.x}${layer.y}`));
+        const dotPositions: {x: number, y: number}[] = [];
+        
+        for (let i = 0; i < numDots; i++) {
+          const angle = (i / numDots) * Math.PI * 2 + dotRand() * 0.5;
+          const dist = layer.size * (0.3 + dotRand() * 0.7);
+          const dotX = layer.x + Math.cos(angle) * dist;
+          const dotY = layer.y + Math.sin(angle) * dist;
+          const dotSize = 1.5 + dotRand() * 1.5;
+          
+          dotPositions.push({x: dotX, y: dotY});
+          shapes += `<circle cx="${dotX.toFixed(1)}" cy="${dotY.toFixed(1)}" r="${dotSize.toFixed(1)}" fill="#ffffff" opacity="${opacity}"/>`;
+        }
+        
+        // Connect dots
+        for (let i = 0; i < dotPositions.length - 1; i++) {
+          shapes += `<line x1="${dotPositions[i].x.toFixed(1)}" y1="${dotPositions[i].y.toFixed(1)}" x2="${dotPositions[i + 1].x.toFixed(1)}" y2="${dotPositions[i + 1].y.toFixed(1)}" stroke="#ffffff" stroke-width="0.5" opacity="${(layer.opacity * 0.5).toFixed(2)}"/>`;
+        }
+        break;
+        
+      case 'wavy-line':
+        const waves = layer.variant || 3;
+        const amplitude = layer.size * 0.2;
+        const wrot = layer.rotation * Math.PI / 180;
+        let wavePath = '';
+        
+        for (let x = -layer.size; x <= layer.size; x += 2) {
+          const progress = (x + layer.size) / (layer.size * 2);
+          const ly = Math.sin(progress * Math.PI * 2 * waves) * amplitude;
+          const rx = x * Math.cos(wrot) - ly * Math.sin(wrot) + layer.x;
+          const ry = x * Math.sin(wrot) + ly * Math.cos(wrot) + layer.y;
+          wavePath += (x === -layer.size ? 'M' : 'L') + `${rx.toFixed(1)},${ry.toFixed(1)} `;
+        }
+        shapes += `<path d="${wavePath}" fill="none" stroke="#ffffff" stroke-width="${sw}" opacity="${opacity}" stroke-linecap="round"/>`;
+        break;
+        
+      case 'connection':
+        const connRand = seededRandom(hashString(`${layer.x}${layer.y}${layer.rotation}`));
+        const connRot = layer.rotation * Math.PI / 180;
+        const startX = -layer.size / 2;
+        const endX = layer.size / 2;
+        const curveY = (connRand() - 0.5) * layer.size * 0.3;
+        
+        const sx = startX * Math.cos(connRot) + layer.x;
+        const sy = startX * Math.sin(connRot) + layer.y;
+        const ex = endX * Math.cos(connRot) + layer.x;
+        const ey = endX * Math.sin(connRot) + layer.y;
+        const cx = layer.x;
+        const cy = curveY * Math.cos(connRot) + layer.y;
+        
+        shapes += `<path d="M${sx.toFixed(1)},${sy.toFixed(1)} Q${cx.toFixed(1)},${cy.toFixed(1)} ${ex.toFixed(1)},${ey.toFixed(1)}" fill="none" stroke="#ffffff" stroke-width="${sw}" opacity="${opacity}" stroke-linecap="round"/>`;
+        break;
+    }
+  });
   
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
     <defs>
@@ -521,20 +587,13 @@ export function generateAvatarSVG(email: string, size: number = 256): string {
         <stop offset="70%" style="stop-color:#0f0f23"/>
         <stop offset="100%" style="stop-color:#0a0a15"/>
       </radialGradient>
-      ${gradientDefs}
       <clipPath id="rounded">
         <rect width="${size}" height="${size}" rx="${size * 0.15}" ry="${size * 0.15}"/>
       </clipPath>
-      <radialGradient id="vignette" cx="50%" cy="50%">
-        <stop offset="15%" style="stop-color:transparent"/>
-        <stop offset="100%" style="stop-color:rgba(0,0,0,0.3)"/>
-      </radialGradient>
     </defs>
     <g clip-path="url(#rounded)">
       <rect width="${size}" height="${size}" fill="url(#bgGrad)"/>
-      ${bgStars}
       ${shapes}
-      <rect width="${size}" height="${size}" fill="url(#vignette)"/>
     </g>
   </svg>`;
 }
