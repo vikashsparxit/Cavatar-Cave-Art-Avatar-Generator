@@ -481,18 +481,26 @@ export function generateAvatarCanvas(email: string, size: number = 256, backgrou
     ctx.fillRect(0, 0, size, size);
   }
   
-  // Draw first letter silhouette (subtle outline behind elements)
+  // Draw first letter silhouette (filled + outlined for visibility at small sizes)
   const firstLetter = getFirstLetter(email);
   if (firstLetter) {
     ctx.save();
-    ctx.globalAlpha = 0.08;
-    ctx.strokeStyle = lineColor;
-    ctx.lineWidth = size * 0.008;
     ctx.font = `bold ${size * 0.85}px Arial, sans-serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    // Slight vertical adjustment for optical centering
-    ctx.strokeText(firstLetter, size / 2, size / 2 + size * 0.02);
+    const textX = size / 2;
+    const textY = size / 2 + size * 0.02;
+    
+    // Fill the letter with cave color (visible at small sizes)
+    ctx.globalAlpha = 0.12;
+    ctx.fillStyle = lineColor;
+    ctx.fillText(firstLetter, textX, textY);
+    
+    // Stroke/border for definition
+    ctx.globalAlpha = 0.08;
+    ctx.strokeStyle = lineColor;
+    ctx.lineWidth = size * 0.008;
+    ctx.strokeText(firstLetter, textX, textY);
     ctx.restore();
   }
   
@@ -562,10 +570,12 @@ export function generateAvatarSVG(email: string, size: number = 256, background:
     bgRect = `<rect width="${size}" height="${size}" fill="${background}"/>`;
   }
   
-  // Add first letter silhouette (outline only)
+  // Add first letter silhouette (filled + outlined for visibility at small sizes)
   const firstLetter = getFirstLetter(email);
   if (firstLetter) {
-    // dy attribute for optical vertical centering
+    // Filled letter for visibility at small sizes
+    shapes += `<text x="${size / 2}" y="${size / 2}" dy="0.35em" font-family="Arial, sans-serif" font-size="${size * 0.85}" font-weight="bold" fill="${lineColor}" opacity="0.12" text-anchor="middle">${firstLetter}</text>`;
+    // Stroked border for definition
     shapes += `<text x="${size / 2}" y="${size / 2}" dy="0.35em" font-family="Arial, sans-serif" font-size="${size * 0.85}" font-weight="bold" fill="none" stroke="${lineColor}" stroke-width="${size * 0.008}" opacity="0.08" text-anchor="middle">${firstLetter}</text>`;
   }
   
