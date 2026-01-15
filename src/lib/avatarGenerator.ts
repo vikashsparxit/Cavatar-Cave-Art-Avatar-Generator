@@ -1,5 +1,7 @@
 // Cave art / petroglyphic style avatar generation with white line drawings
 
+export type BackgroundType = 'cosmos' | 'white' | string;
+
 function hashString(str: string): number {
   let hash = 5381;
   for (let i = 0; i < str.length; i++) {
@@ -13,6 +15,26 @@ function seededRandom(seed: number): () => number {
     seed = (seed * 1103515245 + 12345) & 0x7fffffff;
     return seed / 0x7fffffff;
   };
+}
+
+// Determine if a color is light or dark
+function isLightColor(hex: string): boolean {
+  const c = hex.replace('#', '');
+  const r = parseInt(c.substring(0, 2), 16);
+  const g = parseInt(c.substring(2, 4), 16);
+  const b = parseInt(c.substring(4, 6), 16);
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  return luminance > 0.5;
+}
+
+function getLineColor(background: BackgroundType): string {
+  if (background === 'cosmos') return '#ffffff';
+  if (background === 'white') return '#1a1a2e';
+  // For custom hex colors, determine contrast
+  if (background.startsWith('#')) {
+    return isLightColor(background) ? '#1a1a2e' : '#ffffff';
+  }
+  return '#ffffff';
 }
 
 interface LayerElement {
@@ -178,10 +200,10 @@ function generateLayers(email: string, size: number): LayerElement[] {
   return layers;
 }
 
-function drawLineCircle(ctx: CanvasRenderingContext2D, layer: LayerElement): void {
+function drawLineCircle(ctx: CanvasRenderingContext2D, layer: LayerElement, lineColor: string): void {
   ctx.save();
   ctx.globalAlpha = layer.opacity;
-  ctx.strokeStyle = '#ffffff';
+  ctx.strokeStyle = lineColor;
   ctx.lineWidth = layer.strokeWidth;
   ctx.lineCap = 'round';
   ctx.beginPath();
@@ -190,11 +212,11 @@ function drawLineCircle(ctx: CanvasRenderingContext2D, layer: LayerElement): voi
   ctx.restore();
 }
 
-function drawConcentric(ctx: CanvasRenderingContext2D, layer: LayerElement): void {
+function drawConcentric(ctx: CanvasRenderingContext2D, layer: LayerElement, lineColor: string): void {
   const rings = layer.variant || 3;
   ctx.save();
   ctx.globalAlpha = layer.opacity;
-  ctx.strokeStyle = '#ffffff';
+  ctx.strokeStyle = lineColor;
   ctx.lineWidth = layer.strokeWidth;
   ctx.lineCap = 'round';
   
@@ -207,12 +229,12 @@ function drawConcentric(ctx: CanvasRenderingContext2D, layer: LayerElement): voi
   ctx.restore();
 }
 
-function drawSpiral(ctx: CanvasRenderingContext2D, layer: LayerElement): void {
+function drawSpiral(ctx: CanvasRenderingContext2D, layer: LayerElement, lineColor: string): void {
   ctx.save();
   ctx.translate(layer.x, layer.y);
   ctx.rotate((layer.rotation * Math.PI) / 180);
   ctx.globalAlpha = layer.opacity;
-  ctx.strokeStyle = '#ffffff';
+  ctx.strokeStyle = lineColor;
   ctx.lineWidth = layer.strokeWidth;
   ctx.lineCap = 'round';
   
@@ -232,12 +254,12 @@ function drawSpiral(ctx: CanvasRenderingContext2D, layer: LayerElement): void {
   ctx.restore();
 }
 
-function drawTriangle(ctx: CanvasRenderingContext2D, layer: LayerElement): void {
+function drawTriangle(ctx: CanvasRenderingContext2D, layer: LayerElement, lineColor: string): void {
   ctx.save();
   ctx.translate(layer.x, layer.y);
   ctx.rotate((layer.rotation * Math.PI) / 180);
   ctx.globalAlpha = layer.opacity;
-  ctx.strokeStyle = '#ffffff';
+  ctx.strokeStyle = lineColor;
   ctx.lineWidth = layer.strokeWidth;
   ctx.lineCap = 'round';
   ctx.lineJoin = 'round';
@@ -252,12 +274,12 @@ function drawTriangle(ctx: CanvasRenderingContext2D, layer: LayerElement): void 
   ctx.restore();
 }
 
-function drawCross(ctx: CanvasRenderingContext2D, layer: LayerElement): void {
+function drawCross(ctx: CanvasRenderingContext2D, layer: LayerElement, lineColor: string): void {
   ctx.save();
   ctx.translate(layer.x, layer.y);
   ctx.rotate((layer.rotation * Math.PI) / 180);
   ctx.globalAlpha = layer.opacity;
-  ctx.strokeStyle = '#ffffff';
+  ctx.strokeStyle = lineColor;
   ctx.lineWidth = layer.strokeWidth;
   ctx.lineCap = 'round';
   
@@ -271,14 +293,14 @@ function drawCross(ctx: CanvasRenderingContext2D, layer: LayerElement): void {
   ctx.restore();
 }
 
-function drawDots(ctx: CanvasRenderingContext2D, layer: LayerElement): void {
+function drawDots(ctx: CanvasRenderingContext2D, layer: LayerElement, lineColor: string): void {
   const numDots = layer.variant || 4;
   const hash = hashString(`${layer.x}${layer.y}`);
   const rand = seededRandom(hash);
   
   ctx.save();
   ctx.globalAlpha = layer.opacity;
-  ctx.fillStyle = '#ffffff';
+  ctx.fillStyle = lineColor;
   
   const dotPositions: {x: number, y: number}[] = [];
   
@@ -297,7 +319,7 @@ function drawDots(ctx: CanvasRenderingContext2D, layer: LayerElement): void {
   }
   
   // Connect some dots with thin lines
-  ctx.strokeStyle = '#ffffff';
+  ctx.strokeStyle = lineColor;
   ctx.lineWidth = 0.5;
   ctx.globalAlpha = layer.opacity * 0.5;
   for (let i = 0; i < dotPositions.length - 1; i++) {
@@ -310,12 +332,12 @@ function drawDots(ctx: CanvasRenderingContext2D, layer: LayerElement): void {
   ctx.restore();
 }
 
-function drawWavyLine(ctx: CanvasRenderingContext2D, layer: LayerElement): void {
+function drawWavyLine(ctx: CanvasRenderingContext2D, layer: LayerElement, lineColor: string): void {
   ctx.save();
   ctx.translate(layer.x, layer.y);
   ctx.rotate((layer.rotation * Math.PI) / 180);
   ctx.globalAlpha = layer.opacity;
-  ctx.strokeStyle = '#ffffff';
+  ctx.strokeStyle = lineColor;
   ctx.lineWidth = layer.strokeWidth;
   ctx.lineCap = 'round';
   
@@ -334,7 +356,7 @@ function drawWavyLine(ctx: CanvasRenderingContext2D, layer: LayerElement): void 
   ctx.restore();
 }
 
-function drawConnection(ctx: CanvasRenderingContext2D, layer: LayerElement): void {
+function drawConnection(ctx: CanvasRenderingContext2D, layer: LayerElement, lineColor: string): void {
   const hash = hashString(`${layer.x}${layer.y}${layer.rotation}`);
   const rand = seededRandom(hash);
   
@@ -342,7 +364,7 @@ function drawConnection(ctx: CanvasRenderingContext2D, layer: LayerElement): voi
   ctx.translate(layer.x, layer.y);
   ctx.rotate((layer.rotation * Math.PI) / 180);
   ctx.globalAlpha = layer.opacity;
-  ctx.strokeStyle = '#ffffff';
+  ctx.strokeStyle = lineColor;
   ctx.lineWidth = layer.strokeWidth;
   ctx.lineCap = 'round';
   
@@ -359,16 +381,16 @@ function drawConnection(ctx: CanvasRenderingContext2D, layer: LayerElement): voi
   ctx.restore();
 }
 
-function drawLayer(ctx: CanvasRenderingContext2D, layer: LayerElement): void {
+function drawLayer(ctx: CanvasRenderingContext2D, layer: LayerElement, lineColor: string): void {
   switch (layer.type) {
-    case 'line-circle': drawLineCircle(ctx, layer); break;
-    case 'concentric': drawConcentric(ctx, layer); break;
-    case 'spiral': drawSpiral(ctx, layer); break;
-    case 'triangle': drawTriangle(ctx, layer); break;
-    case 'cross': drawCross(ctx, layer); break;
-    case 'dots': drawDots(ctx, layer); break;
-    case 'wavy-line': drawWavyLine(ctx, layer); break;
-    case 'connection': drawConnection(ctx, layer); break;
+    case 'line-circle': drawLineCircle(ctx, layer, lineColor); break;
+    case 'concentric': drawConcentric(ctx, layer, lineColor); break;
+    case 'spiral': drawSpiral(ctx, layer, lineColor); break;
+    case 'triangle': drawTriangle(ctx, layer, lineColor); break;
+    case 'cross': drawCross(ctx, layer, lineColor); break;
+    case 'dots': drawDots(ctx, layer, lineColor); break;
+    case 'wavy-line': drawWavyLine(ctx, layer, lineColor); break;
+    case 'connection': drawConnection(ctx, layer, lineColor); break;
   }
 }
 
@@ -383,7 +405,7 @@ export function processEmail(email: string) {
   }));
 }
 
-export function generateAvatarCanvas(email: string, size: number = 256): HTMLCanvasElement {
+export function generateAvatarCanvas(email: string, size: number = 256, background: BackgroundType = 'cosmos'): HTMLCanvasElement {
   const canvas = document.createElement('canvas');
   canvas.width = size;
   canvas.height = size;
@@ -391,39 +413,58 @@ export function generateAvatarCanvas(email: string, size: number = 256): HTMLCan
   
   const hash = hashString(email);
   const bgRand = seededRandom(hash + 999);
+  const lineColor = getLineColor(background);
   
-  // Dark cosmos background
-  const bgGradient = ctx.createRadialGradient(
-    size * 0.3, size * 0.3, 0,
-    size / 2, size / 2, size * 0.9
-  );
-  bgGradient.addColorStop(0, '#1a1a2e');
-  bgGradient.addColorStop(0.4, '#16213e');
-  bgGradient.addColorStop(0.7, '#0f0f23');
-  bgGradient.addColorStop(1, '#0a0a15');
-  ctx.fillStyle = bgGradient;
-  ctx.fillRect(0, 0, size, size);
-  
-  // Add subtle background stars (tiny white dots)
-  const numBgStars = 40 + Math.floor(bgRand() * 30);
-  for (let i = 0; i < numBgStars; i++) {
-    const starX = bgRand() * size;
-    const starY = bgRand() * size;
-    const starSize = 0.3 + bgRand() * 0.8;
-    const starOpacity = 0.15 + bgRand() * 0.25;
+  // Draw background based on type
+  if (background === 'cosmos') {
+    // Dark cosmos background
+    const bgGradient = ctx.createRadialGradient(
+      size * 0.3, size * 0.3, 0,
+      size / 2, size / 2, size * 0.9
+    );
+    bgGradient.addColorStop(0, '#1a1a2e');
+    bgGradient.addColorStop(0.4, '#16213e');
+    bgGradient.addColorStop(0.7, '#0f0f23');
+    bgGradient.addColorStop(1, '#0a0a15');
+    ctx.fillStyle = bgGradient;
+    ctx.fillRect(0, 0, size, size);
     
-    ctx.save();
-    ctx.globalAlpha = starOpacity;
-    ctx.fillStyle = '#ffffff';
-    ctx.beginPath();
-    ctx.arc(starX, starY, starSize, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.restore();
+    // Add subtle background stars (tiny white dots)
+    const numBgStars = 40 + Math.floor(bgRand() * 30);
+    for (let i = 0; i < numBgStars; i++) {
+      const starX = bgRand() * size;
+      const starY = bgRand() * size;
+      const starSize = 0.3 + bgRand() * 0.8;
+      const starOpacity = 0.15 + bgRand() * 0.25;
+      
+      ctx.save();
+      ctx.globalAlpha = starOpacity;
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(starX, starY, starSize, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+  } else if (background === 'white') {
+    // Light gradient background
+    const bgGradient = ctx.createRadialGradient(
+      size * 0.3, size * 0.3, 0,
+      size / 2, size / 2, size * 0.9
+    );
+    bgGradient.addColorStop(0, '#ffffff');
+    bgGradient.addColorStop(0.5, '#f8f9fa');
+    bgGradient.addColorStop(1, '#e9ecef');
+    ctx.fillStyle = bgGradient;
+    ctx.fillRect(0, 0, size, size);
+  } else {
+    // Custom hex color - solid fill
+    ctx.fillStyle = background;
+    ctx.fillRect(0, 0, size, size);
   }
   
   // Generate and draw layers
   const layers = generateLayers(email, size);
-  layers.forEach(layer => drawLayer(ctx, layer));
+  layers.forEach(layer => drawLayer(ctx, layer, lineColor));
   
   // Rounded corners mask
   ctx.globalCompositeOperation = 'destination-in';
@@ -436,27 +477,51 @@ export function generateAvatarCanvas(email: string, size: number = 256): HTMLCan
   return canvas;
 }
 
-export function generateAvatarDataURL(email: string, size: number = 256): string {
-  const canvas = generateAvatarCanvas(email, size);
+export function generateAvatarDataURL(email: string, size: number = 256, background: BackgroundType = 'cosmos'): string {
+  const canvas = generateAvatarCanvas(email, size, background);
   return canvas.toDataURL('image/png');
 }
 
-export function generateAvatarSVG(email: string, size: number = 256): string {
+export function generateAvatarSVG(email: string, size: number = 256, background: BackgroundType = 'cosmos'): string {
   const hash = hashString(email);
   const rand = seededRandom(hash);
-  const center = size / 2;
+  const lineColor = getLineColor(background);
   
   let shapes = '';
+  let bgDefs = '';
+  let bgRect = '';
   
-  // Background stars
-  const bgRand = seededRandom(hash + 999);
-  const numBgStars = 40 + Math.floor(bgRand() * 30);
-  for (let i = 0; i < numBgStars; i++) {
-    const starX = bgRand() * size;
-    const starY = bgRand() * size;
-    const starSize = 0.3 + bgRand() * 0.8;
-    const starOpacity = 0.15 + bgRand() * 0.25;
-    shapes += `<circle cx="${starX}" cy="${starY}" r="${starSize}" fill="#ffffff" opacity="${starOpacity}"/>`;
+  // Background based on type
+  if (background === 'cosmos') {
+    bgDefs = `
+      <radialGradient id="bgGrad" cx="30%" cy="30%">
+        <stop offset="0%" style="stop-color:#1a1a2e"/>
+        <stop offset="40%" style="stop-color:#16213e"/>
+        <stop offset="70%" style="stop-color:#0f0f23"/>
+        <stop offset="100%" style="stop-color:#0a0a15"/>
+      </radialGradient>`;
+    bgRect = `<rect width="${size}" height="${size}" fill="url(#bgGrad)"/>`;
+    
+    // Background stars
+    const bgRand = seededRandom(hash + 999);
+    const numBgStars = 40 + Math.floor(bgRand() * 30);
+    for (let i = 0; i < numBgStars; i++) {
+      const starX = bgRand() * size;
+      const starY = bgRand() * size;
+      const starSize = 0.3 + bgRand() * 0.8;
+      const starOpacity = 0.15 + bgRand() * 0.25;
+      shapes += `<circle cx="${starX}" cy="${starY}" r="${starSize}" fill="#ffffff" opacity="${starOpacity}"/>`;
+    }
+  } else if (background === 'white') {
+    bgDefs = `
+      <radialGradient id="bgGrad" cx="30%" cy="30%">
+        <stop offset="0%" style="stop-color:#ffffff"/>
+        <stop offset="50%" style="stop-color:#f8f9fa"/>
+        <stop offset="100%" style="stop-color:#e9ecef"/>
+      </radialGradient>`;
+    bgRect = `<rect width="${size}" height="${size}" fill="url(#bgGrad)"/>`;
+  } else {
+    bgRect = `<rect width="${size}" height="${size}" fill="${background}"/>`;
   }
   
   // Generate layers and convert to SVG
@@ -468,14 +533,14 @@ export function generateAvatarSVG(email: string, size: number = 256): string {
     
     switch (layer.type) {
       case 'line-circle':
-        shapes += `<circle cx="${layer.x}" cy="${layer.y}" r="${layer.size}" fill="none" stroke="#ffffff" stroke-width="${sw}" opacity="${opacity}" stroke-linecap="round"/>`;
+        shapes += `<circle cx="${layer.x}" cy="${layer.y}" r="${layer.size}" fill="none" stroke="${lineColor}" stroke-width="${sw}" opacity="${opacity}" stroke-linecap="round"/>`;
         break;
         
       case 'concentric':
         const rings = layer.variant || 3;
         for (let i = 0; i < rings; i++) {
           const radius = layer.size * (0.4 + (i / rings) * 0.6);
-          shapes += `<circle cx="${layer.x}" cy="${layer.y}" r="${radius}" fill="none" stroke="#ffffff" stroke-width="${sw}" opacity="${opacity}" stroke-linecap="round"/>`;
+          shapes += `<circle cx="${layer.x}" cy="${layer.y}" r="${radius}" fill="none" stroke="${lineColor}" stroke-width="${sw}" opacity="${opacity}" stroke-linecap="round"/>`;
         }
         break;
         
@@ -488,7 +553,7 @@ export function generateAvatarSVG(email: string, size: number = 256): string {
           const y = layer.y + Math.sin(angle * dir + layer.rotation * Math.PI / 180) * r;
           spiralPath += (angle === 0 ? 'M' : 'L') + `${x.toFixed(1)},${y.toFixed(1)} `;
         }
-        shapes += `<path d="${spiralPath}" fill="none" stroke="#ffffff" stroke-width="${sw}" opacity="${opacity}" stroke-linecap="round"/>`;
+        shapes += `<path d="${spiralPath}" fill="none" stroke="${lineColor}" stroke-width="${sw}" opacity="${opacity}" stroke-linecap="round"/>`;
         break;
         
       case 'triangle':
@@ -503,7 +568,7 @@ export function generateAvatarSVG(email: string, size: number = 256): string {
           const ry = px * Math.sin(rot) + py * Math.cos(rot) + layer.y;
           return `${rx.toFixed(1)},${ry.toFixed(1)}`;
         }).join(' ');
-        shapes += `<polygon points="${points}" fill="none" stroke="#ffffff" stroke-width="${sw}" opacity="${opacity}" stroke-linecap="round" stroke-linejoin="round"/>`;
+        shapes += `<polygon points="${points}" fill="none" stroke="${lineColor}" stroke-width="${sw}" opacity="${opacity}" stroke-linecap="round" stroke-linejoin="round"/>`;
         break;
         
       case 'cross':
@@ -518,7 +583,7 @@ export function generateAvatarSVG(email: string, size: number = 256): string {
           const ry1 = x1 * Math.sin(crot) + y1 * Math.cos(crot) + layer.y;
           const rx2 = x2 * Math.cos(crot) - y2 * Math.sin(crot) + layer.x;
           const ry2 = x2 * Math.sin(crot) + y2 * Math.cos(crot) + layer.y;
-          shapes += `<line x1="${rx1.toFixed(1)}" y1="${ry1.toFixed(1)}" x2="${rx2.toFixed(1)}" y2="${ry2.toFixed(1)}" stroke="#ffffff" stroke-width="${sw}" opacity="${opacity}" stroke-linecap="round"/>`;
+          shapes += `<line x1="${rx1.toFixed(1)}" y1="${ry1.toFixed(1)}" x2="${rx2.toFixed(1)}" y2="${ry2.toFixed(1)}" stroke="${lineColor}" stroke-width="${sw}" opacity="${opacity}" stroke-linecap="round"/>`;
         });
         break;
         
@@ -535,12 +600,12 @@ export function generateAvatarSVG(email: string, size: number = 256): string {
           const dotSize = 1.5 + dotRand() * 1.5;
           
           dotPositions.push({x: dotX, y: dotY});
-          shapes += `<circle cx="${dotX.toFixed(1)}" cy="${dotY.toFixed(1)}" r="${dotSize.toFixed(1)}" fill="#ffffff" opacity="${opacity}"/>`;
+          shapes += `<circle cx="${dotX.toFixed(1)}" cy="${dotY.toFixed(1)}" r="${dotSize.toFixed(1)}" fill="${lineColor}" opacity="${opacity}"/>`;
         }
         
         // Connect dots
         for (let i = 0; i < dotPositions.length - 1; i++) {
-          shapes += `<line x1="${dotPositions[i].x.toFixed(1)}" y1="${dotPositions[i].y.toFixed(1)}" x2="${dotPositions[i + 1].x.toFixed(1)}" y2="${dotPositions[i + 1].y.toFixed(1)}" stroke="#ffffff" stroke-width="0.5" opacity="${(layer.opacity * 0.5).toFixed(2)}"/>`;
+          shapes += `<line x1="${dotPositions[i].x.toFixed(1)}" y1="${dotPositions[i].y.toFixed(1)}" x2="${dotPositions[i + 1].x.toFixed(1)}" y2="${dotPositions[i + 1].y.toFixed(1)}" stroke="${lineColor}" stroke-width="0.5" opacity="${(layer.opacity * 0.5).toFixed(2)}"/>`;
         }
         break;
         
@@ -557,7 +622,7 @@ export function generateAvatarSVG(email: string, size: number = 256): string {
           const ry = x * Math.sin(wrot) + ly * Math.cos(wrot) + layer.y;
           wavePath += (x === -layer.size ? 'M' : 'L') + `${rx.toFixed(1)},${ry.toFixed(1)} `;
         }
-        shapes += `<path d="${wavePath}" fill="none" stroke="#ffffff" stroke-width="${sw}" opacity="${opacity}" stroke-linecap="round"/>`;
+        shapes += `<path d="${wavePath}" fill="none" stroke="${lineColor}" stroke-width="${sw}" opacity="${opacity}" stroke-linecap="round"/>`;
         break;
         
       case 'connection':
@@ -574,25 +639,20 @@ export function generateAvatarSVG(email: string, size: number = 256): string {
         const cx = layer.x;
         const cy = curveY * Math.cos(connRot) + layer.y;
         
-        shapes += `<path d="M${sx.toFixed(1)},${sy.toFixed(1)} Q${cx.toFixed(1)},${cy.toFixed(1)} ${ex.toFixed(1)},${ey.toFixed(1)}" fill="none" stroke="#ffffff" stroke-width="${sw}" opacity="${opacity}" stroke-linecap="round"/>`;
+        shapes += `<path d="M${sx.toFixed(1)},${sy.toFixed(1)} Q${cx.toFixed(1)},${cy.toFixed(1)} ${ex.toFixed(1)},${ey.toFixed(1)}" fill="none" stroke="${lineColor}" stroke-width="${sw}" opacity="${opacity}" stroke-linecap="round"/>`;
         break;
     }
   });
   
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
     <defs>
-      <radialGradient id="bgGrad" cx="30%" cy="30%">
-        <stop offset="0%" style="stop-color:#1a1a2e"/>
-        <stop offset="40%" style="stop-color:#16213e"/>
-        <stop offset="70%" style="stop-color:#0f0f23"/>
-        <stop offset="100%" style="stop-color:#0a0a15"/>
-      </radialGradient>
+      ${bgDefs}
       <clipPath id="rounded">
         <rect width="${size}" height="${size}" rx="${size * 0.15}" ry="${size * 0.15}"/>
       </clipPath>
     </defs>
     <g clip-path="url(#rounded)">
-      <rect width="${size}" height="${size}" fill="url(#bgGrad)"/>
+      ${bgRect}
       ${shapes}
     </g>
   </svg>`;

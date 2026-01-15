@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { AvatarPreview } from "@/components/AvatarPreview";
 import { CharacterBreakdown } from "@/components/CharacterBreakdown";
 import { CodeExample } from "@/components/CodeExample";
-import { generateAvatarDataURL } from "@/lib/avatarGenerator";
+import { generateAvatarDataURL, BackgroundType } from "@/lib/avatarGenerator";
 
 const DEMO_EMAILS = [
   "vikashshingh@gmail.com",
@@ -14,10 +14,20 @@ const DEMO_EMAILS = [
   "developer@api.com",
 ];
 
+type BackgroundOption = 'cosmos' | 'white' | 'custom';
+
 const Index = () => {
   const [email, setEmail] = useState("vikashshingh@gmail.com");
   const [copied, setCopied] = useState(false);
   const [demoIndex, setDemoIndex] = useState(0);
+  const [bgOption, setBgOption] = useState<BackgroundOption>('cosmos');
+  const [customColor, setCustomColor] = useState('#6366f1');
+
+  // Get the actual background value to pass to avatar generator
+  const getBackground = (): BackgroundType => {
+    if (bgOption === 'custom') return customColor;
+    return bgOption;
+  };
 
   // Rotate demo avatars
   useEffect(() => {
@@ -28,7 +38,7 @@ const Index = () => {
   }, []);
 
   const handleDownload = () => {
-    const dataUrl = generateAvatarDataURL(email, 512);
+    const dataUrl = generateAvatarDataURL(email, 512, getBackground());
     const link = document.createElement("a");
     link.download = `avatar-${email.split("@")[0]}.png`;
     link.href = dataUrl;
@@ -36,16 +46,18 @@ const Index = () => {
   };
 
   const handleCopyUrl = async () => {
-    const url = `https://api.avatargen.io/v1/avatar?email=${encodeURIComponent(email)}`;
+    const bgParam = bgOption === 'custom' ? encodeURIComponent(customColor) : bgOption;
+    const url = `https://api.avatargen.io/v1/avatar?email=${encodeURIComponent(email)}&background=${bgParam}`;
     await navigator.clipboard.writeText(url);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const curlExample = `curl "https://api.avatargen.io/v1/avatar?email=${email}&size=256&format=png" -o avatar.png`;
+  const bgParam = bgOption === 'custom' ? customColor : bgOption;
+  const curlExample = `curl "https://api.avatargen.io/v1/avatar?email=${email}&size=256&format=png&background=${bgParam}" -o avatar.png`;
 
   const jsExample = `const email = '${email}';
-const avatarUrl = \`https://api.avatargen.io/v1/avatar?email=\${encodeURIComponent(email)}&size=256\`;
+const avatarUrl = \`https://api.avatargen.io/v1/avatar?email=\${encodeURIComponent(email)}&size=256&background=${bgParam}\`;
 
 // Use in img tag
 <img src={avatarUrl} alt="User Avatar" />`;
@@ -53,7 +65,7 @@ const avatarUrl = \`https://api.avatargen.io/v1/avatar?email=\${encodeURICompone
   const pythonExample = `import requests
 
 email = '${email}'
-url = f'https://api.avatargen.io/v1/avatar?email={email}&size=256&format=png'
+url = f'https://api.avatargen.io/v1/avatar?email={email}&size=256&format=png&background=${bgParam}'
 response = requests.get(url)
 
 with open('avatar.png', 'wb') as f:
@@ -201,6 +213,67 @@ with open('avatar.png', 'wb') as f:
                   </div>
                 </div>
 
+                {/* Background selector */}
+                <div className="space-y-3">
+                  <label className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
+                    Background
+                  </label>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setBgOption('cosmos')}
+                      className={`flex-1 h-10 rounded-lg font-medium text-sm transition-all ${
+                        bgOption === 'cosmos'
+                          ? 'bg-primary text-primary-foreground shadow-md'
+                          : 'bg-muted hover:bg-muted/80 text-muted-foreground'
+                      }`}
+                    >
+                      Cosmos
+                    </button>
+                    <button
+                      onClick={() => setBgOption('white')}
+                      className={`flex-1 h-10 rounded-lg font-medium text-sm transition-all ${
+                        bgOption === 'white'
+                          ? 'bg-primary text-primary-foreground shadow-md'
+                          : 'bg-muted hover:bg-muted/80 text-muted-foreground'
+                      }`}
+                    >
+                      White
+                    </button>
+                    <button
+                      onClick={() => setBgOption('custom')}
+                      className={`flex-1 h-10 rounded-lg font-medium text-sm transition-all ${
+                        bgOption === 'custom'
+                          ? 'bg-primary text-primary-foreground shadow-md'
+                          : 'bg-muted hover:bg-muted/80 text-muted-foreground'
+                      }`}
+                    >
+                      Custom
+                    </button>
+                  </div>
+                  
+                  {/* Custom hex input */}
+                  {bgOption === 'custom' && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="flex gap-2 items-center"
+                    >
+                      <div 
+                        className="w-10 h-10 rounded-lg border border-border shrink-0"
+                        style={{ backgroundColor: customColor }}
+                      />
+                      <input
+                        type="text"
+                        value={customColor}
+                        onChange={(e) => setCustomColor(e.target.value)}
+                        placeholder="#6366f1"
+                        className="flex-1 h-10 px-3 rounded-lg bg-muted/50 border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all font-mono text-sm uppercase"
+                      />
+                    </motion.div>
+                  )}
+                </div>
+
                 {/* Action buttons */}
                 <div className="flex gap-3">
                   <Button variant="glow" className="flex-1" onClick={handleDownload}>
@@ -224,7 +297,7 @@ with open('avatar.png', 'wb') as f:
                 viewport={{ once: true }}
                 className="flex flex-col items-center gap-6"
               >
-                <AvatarPreview email={email} size={320} className="shadow-avatar" />
+                <AvatarPreview email={email} size={320} background={getBackground()} className="shadow-avatar" />
                 <div className="text-center space-y-2">
                   <p className="text-sm text-muted-foreground">256 × 256 pixels</p>
                   <p className="font-mono text-xs text-muted-foreground/60 break-all max-w-[300px]">
@@ -287,6 +360,11 @@ with open('avatar.png', 'wb') as f:
                     <span className="text-primary">format</span>
                     <span className="text-muted-foreground">(optional)</span>
                     <span className="text-foreground/70">png or svg (default: png)</span>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <span className="text-primary">background</span>
+                    <span className="text-muted-foreground">(optional)</span>
+                    <span className="text-foreground/70">cosmos, white, or hex color (default: cosmos)</span>
                   </div>
                 </div>
               </div>
