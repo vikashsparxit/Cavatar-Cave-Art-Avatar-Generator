@@ -396,46 +396,21 @@ export function generateAvatarCanvas(email: string, size: number = 256): HTMLCan
   
   const hash = hashString(email);
   
-  // Deep cosmic background - dark with subtle color
-  const bgHue = (hash % 40) + 250; // Purple-blue spectrum
-  const bgHue2 = ((hash >> 8) % 30) + 280;
-  
+  // Light gradient background - white center fading to soft cream/gray edges
   const bgGradient = ctx.createRadialGradient(
-    size * 0.3, size * 0.3, 0,
-    size / 2, size / 2, size * 0.9
+    size * 0.4, size * 0.4, 0,
+    size / 2, size / 2, size * 0.85
   );
-  bgGradient.addColorStop(0, `hsl(${bgHue}, 50%, 12%)`);
-  bgGradient.addColorStop(0.5, `hsl(${(bgHue + bgHue2) / 2}, 40%, 7%)`);
-  bgGradient.addColorStop(1, `hsl(${bgHue2}, 60%, 4%)`);
+  bgGradient.addColorStop(0, '#FFFFFF');
+  bgGradient.addColorStop(0.5, '#FAFAFA');
+  bgGradient.addColorStop(0.8, '#F0F0F0');
+  bgGradient.addColorStop(1, '#E8E8E8');
   ctx.fillStyle = bgGradient;
   ctx.fillRect(0, 0, size, size);
-  
-  // Subtle background stars (tiny dots)
-  const rand = seededRandom(hash);
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
-  for (let i = 0; i < 20; i++) {
-    const x = rand() * size;
-    const y = rand() * size;
-    const r = rand() * 0.8 + 0.2;
-    ctx.beginPath();
-    ctx.arc(x, y, r, 0, Math.PI * 2);
-    ctx.fill();
-  }
   
   // Generate and draw layers
   const layers = generateLayers(email, size);
   layers.forEach(layer => drawLayer(ctx, layer));
-  
-  // Strong vignette to darken edges
-  const vignette = ctx.createRadialGradient(
-    size / 2, size / 2, size * 0.15,
-    size / 2, size / 2, size * 0.6
-  );
-  vignette.addColorStop(0, 'rgba(0,0,0,0)');
-  vignette.addColorStop(0.7, 'rgba(0,0,0,0.3)');
-  vignette.addColorStop(1, 'rgba(0,0,0,0.6)');
-  ctx.fillStyle = vignette;
-  ctx.fillRect(0, 0, size, size);
   
   // Rounded corners mask
   ctx.globalCompositeOperation = 'destination-in';
@@ -454,12 +429,8 @@ export function generateAvatarDataURL(email: string, size: number = 256): string
 }
 
 export function generateAvatarSVG(email: string, size: number = 256): string {
-  const hash = hashString(email);
   const chars = email.toUpperCase().replace(/[^A-Z0-9@._\-+]/g, '').split('');
   const center = size / 2;
-  
-  const bgHue = (hash % 40) + 250;
-  const bgHue2 = ((hash >> 8) % 30) + 280;
   
   let shapes = '';
   const numShapes = Math.min(chars.length, 6);
@@ -492,10 +463,11 @@ export function generateAvatarSVG(email: string, size: number = 256): string {
   
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
     <defs>
-      <radialGradient id="bgGrad" cx="30%" cy="30%">
-        <stop offset="0%" style="stop-color:hsl(${bgHue}, 50%, 12%)"/>
-        <stop offset="50%" style="stop-color:hsl(${(bgHue + bgHue2) / 2}, 40%, 7%)"/>
-        <stop offset="100%" style="stop-color:hsl(${bgHue2}, 60%, 4%)"/>
+      <radialGradient id="bgGrad" cx="40%" cy="40%">
+        <stop offset="0%" style="stop-color:#FFFFFF"/>
+        <stop offset="50%" style="stop-color:#FAFAFA"/>
+        <stop offset="80%" style="stop-color:#F0F0F0"/>
+        <stop offset="100%" style="stop-color:#E8E8E8"/>
       </radialGradient>
       ${gradientDefs}
       <clipPath id="rounded">
