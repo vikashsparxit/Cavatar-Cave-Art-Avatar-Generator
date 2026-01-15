@@ -1,27 +1,28 @@
-// Advanced avatar generation with layered, artistic compositions
+// Advanced avatar generation with cosmic/nebula artistic compositions
 
+// Rich, saturated color palettes - vibrant cores with darker variants
 const CHARACTER_PALETTES: Record<string, string[]> = {
-  'A': ['#FF6B6B', '#FF8E8E', '#FFB3B3'], 'B': ['#4ECDC4', '#6FE7DF', '#A8F5F0'],
-  'C': ['#45B7D1', '#6BCAE2', '#A3DFF0'], 'D': ['#96CEB4', '#B5E0CC', '#D4F0E4'],
-  'E': ['#FFEAA7', '#FFF0C0', '#FFF7DA'], 'F': ['#DDA0DD', '#E8BFE8', '#F3DFF3'],
-  'G': ['#98D8C8', '#B5E5D9', '#D2F2EA'], 'H': ['#F7DC6F', '#FAE79C', '#FCF2C9'],
-  'I': ['#BB8FCE', '#CEADE0', '#E1CBF2'], 'J': ['#85C1E9', '#A6D4F0', '#C7E7F7'],
-  'K': ['#F8B739', '#FACB6B', '#FCDF9D'], 'L': ['#82E0AA', '#A8EBC4', '#CEF6DE'],
-  'M': ['#F1948A', '#F5B3AB', '#F9D2CC'], 'N': ['#85929E', '#A3ADB8', '#C1C8D2'],
-  'O': ['#76D7C4', '#9BE4D6', '#C0F1E8'], 'P': ['#F0B27A', '#F4C69E', '#F8DAC2'],
-  'Q': ['#D7BDE2', '#E3D1EB', '#EFE5F4'], 'R': ['#A9CCE3', '#C4DCEC', '#DFECF5'],
-  'S': ['#A3E4D7', '#C0EDE4', '#DDF6F1'], 'T': ['#FAD7A0', '#FCE3BC', '#FEEFD8'],
-  'U': ['#D5A6BD', '#E2C0D1', '#EFDAE5'], 'V': ['#AED6F1', '#C7E3F6', '#E0F0FB'],
-  'W': ['#A2D9CE', '#C0E6DD', '#DEF3EC'], 'X': ['#F9E79F', '#FBEDB8', '#FDF3D1'],
-  'Y': ['#E8DAEF', '#EFE5F4', '#F6F0F9'], 'Z': ['#D6EAF8', '#E5F1FA', '#F4F8FC'],
-  '0': ['#FF9F43', '#FFB76B', '#FFCF93'], '1': ['#EE5A24', '#F27D54', '#F6A084'],
-  '2': ['#0ABDE3', '#42CEE9', '#7ADFEF'], '3': ['#10AC84', '#4CC3A5', '#88DAC6'],
-  '4': ['#5F27CD', '#8658DB', '#AD89E9'], '5': ['#FF6B81', '#FF8FA0', '#FFB3BF'],
-  '6': ['#2E86AB', '#5AA3C2', '#86C0D9'], '7': ['#A55EEA', '#BC87F0', '#D3B0F6'],
-  '8': ['#26DE81', '#5BE7A3', '#90F0C5'], '9': ['#FD79A8', '#FE9BBF', '#FFBDD6'],
-  '@': ['#2C3E50', '#3D5467', '#4E6A7E'], '.': ['#6C5CE7', '#8F83ED', '#B2AAF3'],
-  '_': ['#00CEC9', '#33DBD7', '#66E8E5'], '-': ['#E17055', '#E99580', '#F1BAAB'],
-  '+': ['#00B894', '#33CBAE', '#66DEC8'],
+  'A': ['#FF4444', '#CC2222', '#881111'], 'B': ['#00D9B5', '#009E7F', '#006B55'],
+  'C': ['#00B4D8', '#0077B6', '#004D73'], 'D': ['#2DD4BF', '#0D9488', '#065F5B'],
+  'E': ['#FBBF24', '#D97706', '#92400E'], 'F': ['#E879F9', '#C026D3', '#7E22CE'],
+  'G': ['#34D399', '#059669', '#065F46'], 'H': ['#FCD34D', '#F59E0B', '#B45309'],
+  'I': ['#A78BFA', '#7C3AED', '#5B21B6'], 'J': ['#38BDF8', '#0284C7', '#075985'],
+  'K': ['#FB923C', '#EA580C', '#9A3412'], 'L': ['#4ADE80', '#16A34A', '#166534'],
+  'M': ['#F87171', '#DC2626', '#991B1B'], 'N': ['#94A3B8', '#64748B', '#475569'],
+  'O': ['#2DD4BF', '#14B8A6', '#0F766E'], 'P': ['#FB7185', '#E11D48', '#9F1239'],
+  'Q': ['#C084FC', '#9333EA', '#6B21A8'], 'R': ['#60A5FA', '#2563EB', '#1E40AF'],
+  'S': ['#5EEAD4', '#14B8A6', '#0D9488'], 'T': ['#FDE047', '#EAB308', '#A16207'],
+  'U': ['#F472B6', '#DB2777', '#9D174D'], 'V': ['#7DD3FC', '#0EA5E9', '#0369A1'],
+  'W': ['#6EE7B7', '#10B981', '#047857'], 'X': ['#FEF08A', '#FACC15', '#CA8A04'],
+  'Y': ['#D8B4FE', '#A855F7', '#7E22CE'], 'Z': ['#93C5FD', '#3B82F6', '#1D4ED8'],
+  '0': ['#FF7849', '#EA580C', '#C2410C'], '1': ['#FF5722', '#D84315', '#BF360C'],
+  '2': ['#00BCD4', '#0097A7', '#00838F'], '3': ['#00E676', '#00C853', '#00A044'],
+  '4': ['#7C4DFF', '#651FFF', '#4A148C'], '5': ['#FF4081', '#F50057', '#C51162'],
+  '6': ['#448AFF', '#2979FF', '#2962FF'], '7': ['#E040FB', '#D500F9', '#AA00FF'],
+  '8': ['#00E676', '#00C853', '#009624'], '9': ['#FF4081', '#F50057', '#AD1457'],
+  '@': ['#7C4DFF', '#536DFE', '#3D5AFE'], '.': ['#E040FB', '#AA00FF', '#7B1FA2'],
+  '_': ['#00BFA5', '#00897B', '#00695C'], '-': ['#FF6E40', '#FF3D00', '#DD2C00'],
+  '+': ['#69F0AE', '#00E676', '#00C853'],
 };
 
 function hashString(str: string): number {
@@ -40,7 +41,7 @@ function seededRandom(seed: number): () => number {
 }
 
 interface LayerElement {
-  type: 'orb' | 'ring' | 'arc' | 'blob' | 'wave' | 'crystal' | 'spark';
+  type: 'nebula' | 'glow-orb' | 'ring' | 'crystal' | 'star' | 'arc';
   x: number;
   y: number;
   size: number;
@@ -52,7 +53,7 @@ interface LayerElement {
 
 function getCharacterPalette(char: string): string[] {
   const upper = char.toUpperCase();
-  return CHARACTER_PALETTES[upper] || ['#8E44AD', '#9B59B6', '#BF84D0'];
+  return CHARACTER_PALETTES[upper] || ['#8B5CF6', '#7C3AED', '#5B21B6'];
 }
 
 function generateLayers(email: string, size: number): LayerElement[] {
@@ -62,123 +63,134 @@ function generateLayers(email: string, size: number): LayerElement[] {
   const layers: LayerElement[] = [];
   const center = size / 2;
   
-  // Layer 1: Background orbs (large, blurred, low opacity)
-  const numOrbs = 3 + Math.floor(rand() * 3);
-  for (let i = 0; i < numOrbs; i++) {
+  // Layer 1: Nebula clouds (large, blurred, low opacity - 2-3 max)
+  const numNebulae = 2 + Math.floor(rand() * 2);
+  for (let i = 0; i < numNebulae; i++) {
     const charIndex = Math.floor(rand() * chars.length);
     const palette = getCharacterPalette(chars[charIndex] || 'A');
     const angle = rand() * Math.PI * 2;
-    const distance = size * 0.15 + rand() * size * 0.25;
+    const distance = size * 0.1 + rand() * size * 0.2;
     
     layers.push({
-      type: 'orb',
+      type: 'nebula',
       x: center + Math.cos(angle) * distance,
       y: center + Math.sin(angle) * distance,
-      size: size * 0.4 + rand() * size * 0.3,
+      size: size * 0.5 + rand() * size * 0.3,
       rotation: rand() * 360,
       colors: palette,
-      opacity: 0.3 + rand() * 0.2,
-      blur: size * 0.08,
+      opacity: 0.2 + rand() * 0.15,
+      blur: size * 0.12,
     });
   }
   
-  // Layer 2: Flowing rings
+  // Layer 2: Glowing orbs (core elements - 3-4)
+  const numOrbs = 3 + Math.floor(rand() * 2);
+  for (let i = 0; i < numOrbs; i++) {
+    const charIndex = (i * 2) % chars.length;
+    const palette = getCharacterPalette(chars[charIndex] || 'B');
+    const angle = (i / numOrbs) * Math.PI * 2 + rand() * 0.5;
+    const distance = size * 0.15 + rand() * size * 0.12;
+    
+    layers.push({
+      type: 'glow-orb',
+      x: center + Math.cos(angle) * distance,
+      y: center + Math.sin(angle) * distance,
+      size: size * 0.12 + rand() * size * 0.08,
+      rotation: rand() * 360,
+      colors: palette,
+      opacity: 0.85 + rand() * 0.15,
+      blur: size * 0.02,
+    });
+  }
+  
+  // Layer 3: Accent rings (2-3 thin glowing rings)
   const numRings = 2 + Math.floor(rand() * 2);
   for (let i = 0; i < numRings; i++) {
     const charIndex = (i * 3) % chars.length;
-    const palette = getCharacterPalette(chars[charIndex] || 'B');
+    const palette = getCharacterPalette(chars[charIndex] || 'C');
     
     layers.push({
       type: 'ring',
       x: center,
       y: center,
-      size: size * 0.25 + i * size * 0.15,
+      size: size * 0.2 + i * size * 0.12,
       rotation: rand() * 360,
       colors: palette,
-      opacity: 0.4 + rand() * 0.3,
+      opacity: 0.6 + rand() * 0.3,
       blur: 0,
     });
   }
   
-  // Layer 3: Crystalline shapes based on characters
-  const numCrystals = Math.min(chars.length, 8);
+  // Layer 4: Crystalline shapes based on characters (4-6)
+  const numCrystals = Math.min(chars.length, 6);
   for (let i = 0; i < numCrystals; i++) {
     const palette = getCharacterPalette(chars[i]);
-    const angle = (i / numCrystals) * Math.PI * 2 + rand() * 0.5;
-    const distance = size * 0.18 + rand() * size * 0.12;
+    const angle = (i / numCrystals) * Math.PI * 2 + rand() * 0.4;
+    const distance = size * 0.22 + rand() * size * 0.1;
     
     layers.push({
       type: 'crystal',
       x: center + Math.cos(angle) * distance,
       y: center + Math.sin(angle) * distance,
-      size: size * 0.08 + rand() * size * 0.06,
-      rotation: (angle * 180 / Math.PI) + rand() * 30,
+      size: size * 0.06 + rand() * size * 0.04,
+      rotation: (angle * 180 / Math.PI) + rand() * 20,
       colors: palette,
-      opacity: 0.7 + rand() * 0.3,
+      opacity: 0.9 + rand() * 0.1,
       blur: 0,
     });
   }
   
-  // Layer 4: Arcs emanating from center
-  const numArcs = 3 + Math.floor(rand() * 3);
+  // Layer 5: Arcs (sweeping energy trails - 2-3)
+  const numArcs = 2 + Math.floor(rand() * 2);
   for (let i = 0; i < numArcs; i++) {
     const charIndex = Math.floor(rand() * chars.length);
-    const palette = getCharacterPalette(chars[charIndex] || 'C');
+    const palette = getCharacterPalette(chars[charIndex] || 'D');
     
     layers.push({
       type: 'arc',
       x: center,
       y: center,
-      size: size * 0.2 + i * size * 0.08,
-      rotation: (i * 60) + rand() * 40,
+      size: size * 0.25 + i * size * 0.08,
+      rotation: (i * 90) + rand() * 60,
       colors: palette,
-      opacity: 0.5 + rand() * 0.3,
-      blur: 0,
+      opacity: 0.7 + rand() * 0.2,
+      blur: size * 0.005,
     });
   }
   
-  // Layer 5: Central blob
-  const centralPalette = getCharacterPalette(chars[0] || 'X');
-  layers.push({
-    type: 'blob',
-    x: center,
-    y: center,
-    size: size * 0.25,
-    rotation: rand() * 360,
-    colors: centralPalette,
-    opacity: 0.9,
-    blur: size * 0.01,
-  });
-  
-  // Layer 6: Sparkles/highlights
-  const numSparks = 5 + Math.floor(rand() * 5);
-  for (let i = 0; i < numSparks; i++) {
+  // Layer 6: Colored stars (NOT white - small accent highlights - 4-6)
+  const numStars = 4 + Math.floor(rand() * 3);
+  for (let i = 0; i < numStars; i++) {
+    const charIndex = Math.floor(rand() * chars.length);
+    const palette = getCharacterPalette(chars[charIndex] || 'E');
     const angle = rand() * Math.PI * 2;
     const distance = size * 0.1 + rand() * size * 0.35;
     
     layers.push({
-      type: 'spark',
+      type: 'star',
       x: center + Math.cos(angle) * distance,
       y: center + Math.sin(angle) * distance,
-      size: size * 0.01 + rand() * size * 0.02,
+      size: size * 0.015 + rand() * size * 0.015,
       rotation: rand() * 360,
-      colors: ['#FFFFFF', '#F8F9FA', '#E9ECEF'],
-      opacity: 0.6 + rand() * 0.4,
-      blur: size * 0.005,
+      colors: palette,
+      opacity: 0.8 + rand() * 0.2,
+      blur: size * 0.003,
     });
   }
   
   return layers;
 }
 
-function drawOrb(ctx: CanvasRenderingContext2D, layer: LayerElement): void {
+function drawNebula(ctx: CanvasRenderingContext2D, layer: LayerElement): void {
   const gradient = ctx.createRadialGradient(
     layer.x, layer.y, 0,
     layer.x, layer.y, layer.size / 2
   );
-  gradient.addColorStop(0, layer.colors[0] + 'CC');
-  gradient.addColorStop(0.5, layer.colors[1] + '88');
-  gradient.addColorStop(1, layer.colors[2] + '00');
+  // Fade from bright core to dark (not white)
+  gradient.addColorStop(0, layer.colors[0]);
+  gradient.addColorStop(0.4, layer.colors[1] + 'AA');
+  gradient.addColorStop(0.7, layer.colors[2] + '55');
+  gradient.addColorStop(1, 'transparent');
   
   ctx.save();
   ctx.globalAlpha = layer.opacity;
@@ -190,6 +202,54 @@ function drawOrb(ctx: CanvasRenderingContext2D, layer: LayerElement): void {
   ctx.restore();
 }
 
+function drawGlowOrb(ctx: CanvasRenderingContext2D, layer: LayerElement): void {
+  // Outer glow
+  const outerGlow = ctx.createRadialGradient(
+    layer.x, layer.y, 0,
+    layer.x, layer.y, layer.size * 1.5
+  );
+  outerGlow.addColorStop(0, layer.colors[0] + 'CC');
+  outerGlow.addColorStop(0.3, layer.colors[1] + '66');
+  outerGlow.addColorStop(0.6, layer.colors[2] + '22');
+  outerGlow.addColorStop(1, 'transparent');
+  
+  ctx.save();
+  ctx.globalAlpha = layer.opacity * 0.6;
+  ctx.filter = `blur(${layer.blur * 2}px)`;
+  ctx.fillStyle = outerGlow;
+  ctx.beginPath();
+  ctx.arc(layer.x, layer.y, layer.size * 1.5, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+  
+  // Core orb
+  const coreGradient = ctx.createRadialGradient(
+    layer.x - layer.size * 0.2, layer.y - layer.size * 0.2, 0,
+    layer.x, layer.y, layer.size
+  );
+  coreGradient.addColorStop(0, layer.colors[0]);
+  coreGradient.addColorStop(0.5, layer.colors[1]);
+  coreGradient.addColorStop(1, layer.colors[2]);
+  
+  ctx.save();
+  ctx.globalAlpha = layer.opacity;
+  ctx.fillStyle = coreGradient;
+  ctx.beginPath();
+  ctx.arc(layer.x, layer.y, layer.size, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // Subtle highlight (colored, not white)
+  const highlightGradient = ctx.createRadialGradient(
+    layer.x - layer.size * 0.3, layer.y - layer.size * 0.3, 0,
+    layer.x, layer.y, layer.size * 0.6
+  );
+  highlightGradient.addColorStop(0, layer.colors[0] + '80');
+  highlightGradient.addColorStop(1, 'transparent');
+  ctx.fillStyle = highlightGradient;
+  ctx.fill();
+  ctx.restore();
+}
+
 function drawRing(ctx: CanvasRenderingContext2D, layer: LayerElement): void {
   ctx.save();
   ctx.translate(layer.x, layer.y);
@@ -197,36 +257,19 @@ function drawRing(ctx: CanvasRenderingContext2D, layer: LayerElement): void {
   ctx.globalAlpha = layer.opacity;
   
   const gradient = ctx.createLinearGradient(-layer.size, 0, layer.size, 0);
-  gradient.addColorStop(0, layer.colors[0] + '00');
-  gradient.addColorStop(0.3, layer.colors[0]);
-  gradient.addColorStop(0.5, layer.colors[1]);
-  gradient.addColorStop(0.7, layer.colors[2]);
-  gradient.addColorStop(1, layer.colors[2] + '00');
+  gradient.addColorStop(0, 'transparent');
+  gradient.addColorStop(0.2, layer.colors[2] + '88');
+  gradient.addColorStop(0.5, layer.colors[0]);
+  gradient.addColorStop(0.8, layer.colors[1] + '88');
+  gradient.addColorStop(1, 'transparent');
   
   ctx.strokeStyle = gradient;
-  ctx.lineWidth = layer.size * 0.08;
+  ctx.lineWidth = layer.size * 0.04;
   ctx.lineCap = 'round';
+  ctx.shadowColor = layer.colors[0];
+  ctx.shadowBlur = layer.size * 0.05;
   ctx.beginPath();
-  ctx.arc(0, 0, layer.size, 0, Math.PI * 1.5);
-  ctx.stroke();
-  ctx.restore();
-}
-
-function drawArc(ctx: CanvasRenderingContext2D, layer: LayerElement): void {
-  ctx.save();
-  ctx.translate(layer.x, layer.y);
-  ctx.rotate((layer.rotation * Math.PI) / 180);
-  ctx.globalAlpha = layer.opacity;
-  
-  const gradient = ctx.createLinearGradient(0, -layer.size, 0, layer.size);
-  gradient.addColorStop(0, layer.colors[0]);
-  gradient.addColorStop(1, layer.colors[2] + '00');
-  
-  ctx.strokeStyle = gradient;
-  ctx.lineWidth = layer.size * 0.15;
-  ctx.lineCap = 'round';
-  ctx.beginPath();
-  ctx.arc(0, 0, layer.size, -Math.PI * 0.3, Math.PI * 0.3);
+  ctx.arc(0, 0, layer.size, 0, Math.PI * 1.6);
   ctx.stroke();
   ctx.restore();
 }
@@ -238,6 +281,11 @@ function drawCrystal(ctx: CanvasRenderingContext2D, layer: LayerElement): void {
   ctx.globalAlpha = layer.opacity;
   
   const s = layer.size;
+  
+  // Outer glow
+  ctx.shadowColor = layer.colors[0];
+  ctx.shadowBlur = s * 0.5;
+  
   const gradient = ctx.createLinearGradient(-s, -s, s, s);
   gradient.addColorStop(0, layer.colors[0]);
   gradient.addColorStop(0.5, layer.colors[1]);
@@ -246,107 +294,86 @@ function drawCrystal(ctx: CanvasRenderingContext2D, layer: LayerElement): void {
   ctx.fillStyle = gradient;
   ctx.beginPath();
   ctx.moveTo(0, -s);
-  ctx.lineTo(s * 0.6, 0);
+  ctx.lineTo(s * 0.5, 0);
   ctx.lineTo(0, s);
-  ctx.lineTo(-s * 0.6, 0);
+  ctx.lineTo(-s * 0.5, 0);
   ctx.closePath();
   ctx.fill();
   
-  // Highlight
-  ctx.fillStyle = 'rgba(255,255,255,0.3)';
+  // Inner facet highlight (colored)
+  const facetGradient = ctx.createLinearGradient(-s * 0.3, -s, s * 0.3, 0);
+  facetGradient.addColorStop(0, layer.colors[0] + '99');
+  facetGradient.addColorStop(1, 'transparent');
+  ctx.fillStyle = facetGradient;
   ctx.beginPath();
   ctx.moveTo(0, -s);
-  ctx.lineTo(s * 0.3, -s * 0.2);
-  ctx.lineTo(0, s * 0.3);
-  ctx.lineTo(-s * 0.2, -s * 0.1);
+  ctx.lineTo(s * 0.25, -s * 0.3);
+  ctx.lineTo(0, s * 0.2);
+  ctx.lineTo(-s * 0.15, -s * 0.2);
   ctx.closePath();
   ctx.fill();
   
   ctx.restore();
 }
 
-function drawBlob(ctx: CanvasRenderingContext2D, layer: LayerElement): void {
+function drawArc(ctx: CanvasRenderingContext2D, layer: LayerElement): void {
   ctx.save();
   ctx.translate(layer.x, layer.y);
   ctx.rotate((layer.rotation * Math.PI) / 180);
   ctx.globalAlpha = layer.opacity;
   
-  const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, layer.size);
+  const gradient = ctx.createLinearGradient(0, -layer.size, 0, layer.size);
   gradient.addColorStop(0, layer.colors[0]);
-  gradient.addColorStop(0.6, layer.colors[1]);
-  gradient.addColorStop(1, layer.colors[2]);
+  gradient.addColorStop(0.5, layer.colors[1] + 'CC');
+  gradient.addColorStop(1, 'transparent');
   
-  ctx.fillStyle = gradient;
+  ctx.strokeStyle = gradient;
+  ctx.lineWidth = layer.size * 0.08;
+  ctx.lineCap = 'round';
+  ctx.shadowColor = layer.colors[0];
+  ctx.shadowBlur = layer.size * 0.1;
   ctx.beginPath();
-  
-  // Organic blob shape using bezier curves
-  const points = 8;
-  const variance = layer.size * 0.15;
-  const hash = hashString(layer.colors[0]);
-  const rand = seededRandom(hash);
-  
-  for (let i = 0; i <= points; i++) {
-    const angle = (i / points) * Math.PI * 2;
-    const r = layer.size * 0.8 + (rand() - 0.5) * variance * 2;
-    const x = Math.cos(angle) * r;
-    const y = Math.sin(angle) * r;
-    
-    if (i === 0) {
-      ctx.moveTo(x, y);
-    } else {
-      const prevAngle = ((i - 1) / points) * Math.PI * 2;
-      const midAngle = (prevAngle + angle) / 2;
-      const cpR = layer.size * 0.9 + (rand() - 0.5) * variance;
-      const cpX = Math.cos(midAngle) * cpR;
-      const cpY = Math.sin(midAngle) * cpR;
-      ctx.quadraticCurveTo(cpX, cpY, x, y);
-    }
-  }
-  
-  ctx.closePath();
-  ctx.fill();
-  
-  // Inner glow
-  const innerGradient = ctx.createRadialGradient(
-    -layer.size * 0.2, -layer.size * 0.2, 0,
-    0, 0, layer.size * 0.7
-  );
-  innerGradient.addColorStop(0, 'rgba(255,255,255,0.4)');
-  innerGradient.addColorStop(1, 'rgba(255,255,255,0)');
-  ctx.fillStyle = innerGradient;
-  ctx.fill();
-  
+  ctx.arc(0, 0, layer.size, -Math.PI * 0.4, Math.PI * 0.4);
+  ctx.stroke();
   ctx.restore();
 }
 
-function drawSpark(ctx: CanvasRenderingContext2D, layer: LayerElement): void {
+function drawStar(ctx: CanvasRenderingContext2D, layer: LayerElement): void {
   ctx.save();
   ctx.globalAlpha = layer.opacity;
-  ctx.filter = `blur(${layer.blur}px)`;
   
+  // Colored star glow (NOT white)
   const gradient = ctx.createRadialGradient(
     layer.x, layer.y, 0,
-    layer.x, layer.y, layer.size
+    layer.x, layer.y, layer.size * 2
   );
-  gradient.addColorStop(0, '#FFFFFF');
-  gradient.addColorStop(0.5, '#FFFFFFAA');
-  gradient.addColorStop(1, '#FFFFFF00');
+  gradient.addColorStop(0, layer.colors[0]);
+  gradient.addColorStop(0.3, layer.colors[1] + 'AA');
+  gradient.addColorStop(0.6, layer.colors[2] + '44');
+  gradient.addColorStop(1, 'transparent');
   
   ctx.fillStyle = gradient;
   ctx.beginPath();
-  ctx.arc(layer.x, layer.y, layer.size, 0, Math.PI * 2);
+  ctx.arc(layer.x, layer.y, layer.size * 2, 0, Math.PI * 2);
   ctx.fill();
+  
+  // Bright core
+  ctx.fillStyle = layer.colors[0];
+  ctx.beginPath();
+  ctx.arc(layer.x, layer.y, layer.size * 0.5, 0, Math.PI * 2);
+  ctx.fill();
+  
   ctx.restore();
 }
 
 function drawLayer(ctx: CanvasRenderingContext2D, layer: LayerElement): void {
   switch (layer.type) {
-    case 'orb': drawOrb(ctx, layer); break;
+    case 'nebula': drawNebula(ctx, layer); break;
+    case 'glow-orb': drawGlowOrb(ctx, layer); break;
     case 'ring': drawRing(ctx, layer); break;
-    case 'arc': drawArc(ctx, layer); break;
     case 'crystal': drawCrystal(ctx, layer); break;
-    case 'blob': drawBlob(ctx, layer); break;
-    case 'spark': drawSpark(ctx, layer); break;
+    case 'arc': drawArc(ctx, layer); break;
+    case 'star': drawStar(ctx, layer); break;
   }
 }
 
@@ -355,8 +382,8 @@ export function processEmail(email: string) {
   return chars.map((char, index) => ({
     char,
     color: getCharacterPalette(char)[0],
-    shape: ['orb', 'crystal', 'ring', 'arc', 'blob'][index % 5] as LayerElement['type'],
-    pattern: 'gradient',
+    shape: ['glow-orb', 'crystal', 'ring', 'arc', 'star'][index % 5] as string,
+    pattern: 'cosmic',
     rotation: (index * 45) % 360,
   }));
 }
@@ -368,32 +395,45 @@ export function generateAvatarCanvas(email: string, size: number = 256): HTMLCan
   const ctx = canvas.getContext('2d')!;
   
   const hash = hashString(email);
-  const rand = seededRandom(hash);
   
-  // Background gradient
-  const bgHue1 = (hash % 60) + 200; // Cool tones
-  const bgHue2 = ((hash >> 8) % 60) + 260;
+  // Deep cosmic background - dark with subtle color
+  const bgHue = (hash % 40) + 250; // Purple-blue spectrum
+  const bgHue2 = ((hash >> 8) % 30) + 280;
+  
   const bgGradient = ctx.createRadialGradient(
     size * 0.3, size * 0.3, 0,
-    size / 2, size / 2, size * 0.8
+    size / 2, size / 2, size * 0.9
   );
-  bgGradient.addColorStop(0, `hsl(${bgHue1}, 30%, 18%)`);
-  bgGradient.addColorStop(0.5, `hsl(${(bgHue1 + bgHue2) / 2}, 25%, 12%)`);
-  bgGradient.addColorStop(1, `hsl(${bgHue2}, 35%, 8%)`);
+  bgGradient.addColorStop(0, `hsl(${bgHue}, 50%, 12%)`);
+  bgGradient.addColorStop(0.5, `hsl(${(bgHue + bgHue2) / 2}, 40%, 7%)`);
+  bgGradient.addColorStop(1, `hsl(${bgHue2}, 60%, 4%)`);
   ctx.fillStyle = bgGradient;
   ctx.fillRect(0, 0, size, size);
+  
+  // Subtle background stars (tiny dots)
+  const rand = seededRandom(hash);
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+  for (let i = 0; i < 20; i++) {
+    const x = rand() * size;
+    const y = rand() * size;
+    const r = rand() * 0.8 + 0.2;
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.fill();
+  }
   
   // Generate and draw layers
   const layers = generateLayers(email, size);
   layers.forEach(layer => drawLayer(ctx, layer));
   
-  // Vignette overlay
+  // Strong vignette to darken edges
   const vignette = ctx.createRadialGradient(
-    size / 2, size / 2, size * 0.2,
-    size / 2, size / 2, size * 0.7
+    size / 2, size / 2, size * 0.15,
+    size / 2, size / 2, size * 0.6
   );
   vignette.addColorStop(0, 'rgba(0,0,0,0)');
-  vignette.addColorStop(1, 'rgba(0,0,0,0.4)');
+  vignette.addColorStop(0.7, 'rgba(0,0,0,0.3)');
+  vignette.addColorStop(1, 'rgba(0,0,0,0.6)');
   ctx.fillStyle = vignette;
   ctx.fillRect(0, 0, size, size);
   
@@ -414,52 +454,62 @@ export function generateAvatarDataURL(email: string, size: number = 256): string
 }
 
 export function generateAvatarSVG(email: string, size: number = 256): string {
-  // Simplified SVG version
   const hash = hashString(email);
   const chars = email.toUpperCase().replace(/[^A-Z0-9@._\-+]/g, '').split('');
   const center = size / 2;
   
-  const bgHue1 = (hash % 60) + 200;
-  const bgHue2 = ((hash >> 8) % 60) + 260;
+  const bgHue = (hash % 40) + 250;
+  const bgHue2 = ((hash >> 8) % 30) + 280;
   
   let shapes = '';
-  const numShapes = Math.min(chars.length, 8);
+  const numShapes = Math.min(chars.length, 6);
   
+  // Glowing orbs
   for (let i = 0; i < numShapes; i++) {
     const palette = getCharacterPalette(chars[i]);
     const angle = (i / numShapes) * Math.PI * 2;
     const distance = size * 0.2;
     const x = center + Math.cos(angle) * distance;
     const y = center + Math.sin(angle) * distance;
-    const shapeSize = size * 0.12;
+    const shapeSize = size * 0.08;
     
     shapes += `
-      <circle cx="${x}" cy="${y}" r="${shapeSize}" fill="${palette[0]}" opacity="0.8">
-        <animate attributeName="opacity" values="0.6;0.9;0.6" dur="${2 + i * 0.3}s" repeatCount="indefinite"/>
-      </circle>`;
+      <circle cx="${x}" cy="${y}" r="${shapeSize * 2}" fill="url(#glow${i})" opacity="0.4"/>
+      <circle cx="${x}" cy="${y}" r="${shapeSize}" fill="${palette[0]}"/>`;
   }
   
-  // Central blob
-  const centralPalette = getCharacterPalette(chars[0] || 'A');
-  shapes += `<circle cx="${center}" cy="${center}" r="${size * 0.18}" fill="url(#centralGrad)"/>`;
+  // Generate gradient defs
+  let gradientDefs = '';
+  for (let i = 0; i < numShapes; i++) {
+    const palette = getCharacterPalette(chars[i]);
+    gradientDefs += `
+      <radialGradient id="glow${i}">
+        <stop offset="0%" style="stop-color:${palette[0]}"/>
+        <stop offset="60%" style="stop-color:${palette[1]};stop-opacity:0.5"/>
+        <stop offset="100%" style="stop-color:${palette[2]};stop-opacity:0"/>
+      </radialGradient>`;
+  }
   
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
     <defs>
       <radialGradient id="bgGrad" cx="30%" cy="30%">
-        <stop offset="0%" style="stop-color:hsl(${bgHue1}, 30%, 18%)"/>
-        <stop offset="100%" style="stop-color:hsl(${bgHue2}, 35%, 8%)"/>
+        <stop offset="0%" style="stop-color:hsl(${bgHue}, 50%, 12%)"/>
+        <stop offset="50%" style="stop-color:hsl(${(bgHue + bgHue2) / 2}, 40%, 7%)"/>
+        <stop offset="100%" style="stop-color:hsl(${bgHue2}, 60%, 4%)"/>
       </radialGradient>
-      <radialGradient id="centralGrad">
-        <stop offset="0%" style="stop-color:${centralPalette[0]}"/>
-        <stop offset="100%" style="stop-color:${centralPalette[2]}"/>
-      </radialGradient>
+      ${gradientDefs}
       <clipPath id="rounded">
         <rect width="${size}" height="${size}" rx="${size * 0.15}" ry="${size * 0.15}"/>
       </clipPath>
+      <radialGradient id="vignette" cx="50%" cy="50%">
+        <stop offset="15%" style="stop-color:transparent"/>
+        <stop offset="100%" style="stop-color:rgba(0,0,0,0.6)"/>
+      </radialGradient>
     </defs>
     <g clip-path="url(#rounded)">
       <rect width="${size}" height="${size}" fill="url(#bgGrad)"/>
       ${shapes}
+      <rect width="${size}" height="${size}" fill="url(#vignette)"/>
     </g>
   </svg>`;
 }
