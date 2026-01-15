@@ -486,56 +486,74 @@ export function generateAvatarCanvas(email: string, size: number = 256, backgrou
   if (firstLetter) {
     const textX = size / 2;
     const textY = size / 2 + size * 0.02;
-    
-    // Create offscreen canvas for the letter with crosshatch
-    const letterCanvas = document.createElement('canvas');
-    letterCanvas.width = size;
-    letterCanvas.height = size;
-    const letterCtx = letterCanvas.getContext('2d')!;
-    
-    // Draw the letter as a solid mask first
-    letterCtx.font = `bold ${size * 0.85}px Arial, sans-serif`;
-    letterCtx.textAlign = 'center';
-    letterCtx.textBaseline = 'middle';
-    letterCtx.fillStyle = lineColor;
-    letterCtx.fillText(firstLetter, textX, textY);
-    
-    // Now draw crosshatch ONLY where the letter pixels exist
-    letterCtx.globalCompositeOperation = 'source-in';
-    letterCtx.strokeStyle = lineColor;
-    letterCtx.lineWidth = Math.max(1, size * 0.006);
-    
+    const fontSize = size * 0.85;
     const lineSpacing = Math.max(4, size * 0.035);
     const diagonal = size * 1.5;
     
+    // Step 1: Create a mask canvas with the letter shape
+    const maskCanvas = document.createElement('canvas');
+    maskCanvas.width = size;
+    maskCanvas.height = size;
+    const maskCtx = maskCanvas.getContext('2d')!;
+    maskCtx.font = `bold ${fontSize}px Arial, sans-serif`;
+    maskCtx.textAlign = 'center';
+    maskCtx.textBaseline = 'middle';
+    maskCtx.fillStyle = 'white';
+    maskCtx.fillText(firstLetter, textX, textY);
+    
+    // Step 2: Create crosshatch canvas
+    const crosshatchCanvas = document.createElement('canvas');
+    crosshatchCanvas.width = size;
+    crosshatchCanvas.height = size;
+    const crossCtx = crosshatchCanvas.getContext('2d')!;
+    
+    // Draw crosshatch lines
+    crossCtx.strokeStyle = lineColor;
+    crossCtx.lineWidth = Math.max(1, size * 0.008);
+    crossCtx.lineCap = 'round';
+    
     // Diagonal lines from top-left to bottom-right
     for (let i = -diagonal; i < diagonal; i += lineSpacing) {
-      letterCtx.beginPath();
-      letterCtx.moveTo(i, 0);
-      letterCtx.lineTo(i + size, size);
-      letterCtx.stroke();
+      crossCtx.beginPath();
+      crossCtx.moveTo(i, 0);
+      crossCtx.lineTo(i + size, size);
+      crossCtx.stroke();
     }
     
     // Diagonal lines from top-right to bottom-left
     for (let i = -diagonal; i < diagonal; i += lineSpacing) {
-      letterCtx.beginPath();
-      letterCtx.moveTo(size - i, 0);
-      letterCtx.lineTo(-i, size);
-      letterCtx.stroke();
+      crossCtx.beginPath();
+      crossCtx.moveTo(size - i, 0);
+      crossCtx.lineTo(-i, size);
+      crossCtx.stroke();
     }
     
-    // Draw the crosshatched letter onto main canvas with transparency
+    // Step 3: Apply mask - keep crosshatch only where letter exists
+    crossCtx.globalCompositeOperation = 'destination-in';
+    crossCtx.drawImage(maskCanvas, 0, 0);
+    
+    // Step 4: Draw filled letter base (subtle)
     ctx.save();
-    ctx.globalAlpha = 0.18;
-    ctx.drawImage(letterCanvas, 0, 0);
+    ctx.globalAlpha = 0.08;
+    ctx.fillStyle = lineColor;
+    ctx.font = `bold ${fontSize}px Arial, sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(firstLetter, textX, textY);
     ctx.restore();
     
-    // Stroke/border for definition
+    // Step 5: Draw the masked crosshatch onto main canvas
     ctx.save();
-    ctx.globalAlpha = 0.12;
+    ctx.globalAlpha = 0.2;
+    ctx.drawImage(crosshatchCanvas, 0, 0);
+    ctx.restore();
+    
+    // Step 6: Stroke/border for definition
+    ctx.save();
+    ctx.globalAlpha = 0.15;
     ctx.strokeStyle = lineColor;
     ctx.lineWidth = size * 0.012;
-    ctx.font = `bold ${size * 0.85}px Arial, sans-serif`;
+    ctx.font = `bold ${fontSize}px Arial, sans-serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.strokeText(firstLetter, textX, textY);
