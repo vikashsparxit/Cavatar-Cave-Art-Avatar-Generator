@@ -63,48 +63,31 @@ function generateLayers(email: string, size: number): LayerElement[] {
   const layers: LayerElement[] = [];
   const center = size / 2;
   
-  // Layer 1: Nebula clouds (large, blurred, low opacity - 2-3 max)
-  const numNebulae = 2 + Math.floor(rand() * 2);
-  for (let i = 0; i < numNebulae; i++) {
-    const charIndex = Math.floor(rand() * chars.length);
+  // Corner angles for placing elements towards corners
+  const cornerAngles = [Math.PI * 0.25, Math.PI * 0.75, Math.PI * 1.25, Math.PI * 1.75];
+  
+  // ===== ZONE 1: LARGE CORNER NEBULAE (fill corners with color presence) =====
+  for (let i = 0; i < 4; i++) {
+    const charIndex = i % chars.length;
     const palette = getCharacterPalette(chars[charIndex] || 'A');
-    const angle = rand() * Math.PI * 2;
-    const distance = size * 0.1 + rand() * size * 0.2;
+    const angle = cornerAngles[i] + (rand() - 0.5) * 0.3;
+    const distance = size * 0.38 + rand() * size * 0.12;
     
     layers.push({
       type: 'nebula',
       x: center + Math.cos(angle) * distance,
       y: center + Math.sin(angle) * distance,
-      size: size * 0.5 + rand() * size * 0.3,
+      size: size * 0.5 + rand() * size * 0.2,
       rotation: rand() * 360,
       colors: palette,
-      opacity: 0.2 + rand() * 0.15,
-      blur: size * 0.12,
+      opacity: 0.25 + rand() * 0.15,
+      blur: size * 0.1,
     });
   }
   
-  // Layer 2: Glowing orbs (core elements - 3-4)
-  const numOrbs = 3 + Math.floor(rand() * 2);
-  for (let i = 0; i < numOrbs; i++) {
-    const charIndex = (i * 2) % chars.length;
-    const palette = getCharacterPalette(chars[charIndex] || 'B');
-    const angle = (i / numOrbs) * Math.PI * 2 + rand() * 0.5;
-    const distance = size * 0.15 + rand() * size * 0.12;
-    
-    layers.push({
-      type: 'glow-orb',
-      x: center + Math.cos(angle) * distance,
-      y: center + Math.sin(angle) * distance,
-      size: size * 0.12 + rand() * size * 0.08,
-      rotation: rand() * 360,
-      colors: palette,
-      opacity: 0.85 + rand() * 0.15,
-      blur: size * 0.02,
-    });
-  }
-  
-  // Layer 3: Accent rings (2-3 thin glowing rings)
+  // ===== ZONE 2: EXTENDED RINGS (reach towards edges) =====
   const numRings = 2 + Math.floor(rand() * 2);
+  const ringRadii = [0.28, 0.42, 0.56]; // Much larger rings
   for (let i = 0; i < numRings; i++) {
     const charIndex = (i * 3) % chars.length;
     const palette = getCharacterPalette(chars[charIndex] || 'C');
@@ -113,34 +96,35 @@ function generateLayers(email: string, size: number): LayerElement[] {
       type: 'ring',
       x: center,
       y: center,
-      size: size * 0.2 + i * size * 0.12,
+      size: size * ringRadii[i % ringRadii.length],
       rotation: rand() * 360,
       colors: palette,
-      opacity: 0.6 + rand() * 0.3,
+      opacity: 0.5 + rand() * 0.3,
       blur: 0,
     });
   }
   
-  // Layer 4: Crystalline shapes based on characters (4-6)
-  const numCrystals = Math.min(chars.length, 6);
-  for (let i = 0; i < numCrystals; i++) {
-    const palette = getCharacterPalette(chars[i]);
-    const angle = (i / numCrystals) * Math.PI * 2 + rand() * 0.4;
-    const distance = size * 0.22 + rand() * size * 0.1;
+  // ===== ZONE 3: PRIMARY ORBS (wider spread, bigger) =====
+  const numOrbs = 4 + Math.floor(rand() * 2);
+  for (let i = 0; i < numOrbs; i++) {
+    const charIndex = (i * 2) % chars.length;
+    const palette = getCharacterPalette(chars[charIndex] || 'B');
+    const angle = (i / numOrbs) * Math.PI * 2 + rand() * 0.5;
+    const distance = size * 0.1 + rand() * size * 0.28; // Extended: 10-38%
     
     layers.push({
-      type: 'crystal',
+      type: 'glow-orb',
       x: center + Math.cos(angle) * distance,
       y: center + Math.sin(angle) * distance,
-      size: size * 0.06 + rand() * size * 0.04,
-      rotation: (angle * 180 / Math.PI) + rand() * 20,
+      size: size * 0.10 + rand() * size * 0.12, // Bigger: 10-22%
+      rotation: rand() * 360,
       colors: palette,
-      opacity: 0.9 + rand() * 0.1,
-      blur: 0,
+      opacity: 0.85 + rand() * 0.15,
+      blur: size * 0.02,
     });
   }
   
-  // Layer 5: Arcs (sweeping energy trails - 2-3)
+  // ===== ZONE 4: EDGE ARCS (sweeping to outer zones) =====
   const numArcs = 2 + Math.floor(rand() * 2);
   for (let i = 0; i < numArcs; i++) {
     const charIndex = Math.floor(rand() * chars.length);
@@ -150,30 +134,68 @@ function generateLayers(email: string, size: number): LayerElement[] {
       type: 'arc',
       x: center,
       y: center,
-      size: size * 0.25 + i * size * 0.08,
+      size: size * 0.32 + i * size * 0.12, // Extended: 32-56%
       rotation: (i * 90) + rand() * 60,
       colors: palette,
-      opacity: 0.7 + rand() * 0.2,
+      opacity: 0.6 + rand() * 0.25,
       blur: size * 0.005,
     });
   }
   
-  // Layer 6: Colored stars (NOT white - small accent highlights - 4-6)
-  const numStars = 4 + Math.floor(rand() * 3);
+  // ===== ZONE 5: CRYSTALS (mid to outer zone) =====
+  const numCrystals = Math.min(chars.length, 5);
+  for (let i = 0; i < numCrystals; i++) {
+    const palette = getCharacterPalette(chars[i]);
+    const angle = (i / numCrystals) * Math.PI * 2 + rand() * 0.4;
+    const distance = size * 0.18 + rand() * size * 0.22; // Extended: 18-40%
+    
+    layers.push({
+      type: 'crystal',
+      x: center + Math.cos(angle) * distance,
+      y: center + Math.sin(angle) * distance,
+      size: size * 0.05 + rand() * size * 0.045,
+      rotation: (angle * 180 / Math.PI) + rand() * 20,
+      colors: palette,
+      opacity: 0.9 + rand() * 0.1,
+      blur: 0,
+    });
+  }
+  
+  // ===== ZONE 6: CORNER ACCENT ORBS (small decorative elements in corners) =====
+  for (let i = 0; i < 4; i++) {
+    const charIndex = (i + 4) % chars.length;
+    const palette = getCharacterPalette(chars[charIndex] || 'F');
+    const angle = cornerAngles[i] + (rand() - 0.5) * 0.5;
+    const distance = size * 0.32 + rand() * size * 0.10;
+    
+    layers.push({
+      type: 'glow-orb',
+      x: center + Math.cos(angle) * distance,
+      y: center + Math.sin(angle) * distance,
+      size: size * 0.04 + rand() * size * 0.03, // Small accent orbs
+      rotation: rand() * 360,
+      colors: palette,
+      opacity: 0.75 + rand() * 0.2,
+      blur: size * 0.01,
+    });
+  }
+  
+  // ===== ZONE 7: SCATTERED STARS (full canvas coverage) =====
+  const numStars = 8 + Math.floor(rand() * 5);
   for (let i = 0; i < numStars; i++) {
     const charIndex = Math.floor(rand() * chars.length);
     const palette = getCharacterPalette(chars[charIndex] || 'E');
     const angle = rand() * Math.PI * 2;
-    const distance = size * 0.1 + rand() * size * 0.35;
+    const distance = size * 0.05 + rand() * size * 0.42; // Full spread: 5-47%
     
     layers.push({
       type: 'star',
       x: center + Math.cos(angle) * distance,
       y: center + Math.sin(angle) * distance,
-      size: size * 0.015 + rand() * size * 0.015,
+      size: size * 0.012 + rand() * size * 0.018,
       rotation: rand() * 360,
       colors: palette,
-      opacity: 0.8 + rand() * 0.2,
+      opacity: 0.7 + rand() * 0.25,
       blur: size * 0.003,
     });
   }
