@@ -7,12 +7,18 @@ import { AvatarPreview } from "@/components/AvatarPreview";
 import { CharacterBreakdown } from "@/components/CharacterBreakdown";
 import { CodeExample } from "@/components/CodeExample";
 import { generateAvatarDataURL, generateAvatarSVG, BackgroundType, AvatarShape, isValidEmail } from "@/lib/avatarGenerator";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
-const DEMO_EMAILS = [
-  "vikashshingh@gmail.com",
-  "alex@company.io",
-  "jane.doe@startup.co",
-  "developer@api.com",
+// Publicly known email addresses of famous tech leaders
+const CELEBRITY_EMAILS = [
+  { email: "elon@tesla.com", name: "Elon Musk" },
+  { email: "tcook@apple.com", name: "Tim Cook" },
+  { email: "zuck@fb.com", name: "Mark Zuckerberg" },
+  { email: "sundar@google.com", name: "Sundar Pichai" },
+  { email: "jeff@amazon.com", name: "Jeff Bezos" },
+  { email: "satyan@microsoft.com", name: "Satya Nadella" },
+  { email: "sjobs@apple.com", name: "Steve Jobs" },
+  { email: "billg@microsoft.com", name: "Bill Gates" },
 ];
 
 type BackgroundOption = 'cosmos' | 'white' | 'custom';
@@ -43,10 +49,10 @@ const Index = () => {
     return bgOption;
   };
 
-  // Rotate demo avatars
+  // Rotate celebrity avatars
   useEffect(() => {
     const interval = setInterval(() => {
-      setDemoIndex((prev) => (prev + 1) % DEMO_EMAILS.length);
+      setDemoIndex((prev) => (prev + 1) % CELEBRITY_EMAILS.length);
     }, 3000);
     return () => clearInterval(interval);
   }, []);
@@ -176,35 +182,77 @@ with open('avatar.png', 'wb') as f:
               transition={{ duration: 0.6, delay: 0.2 }}
               className="relative flex justify-center"
             >
-              <div className="relative">
-                {/* Main avatar */}
-                <div className="animate-float">
-                  <AvatarPreview email={DEMO_EMAILS[demoIndex]} size={280} className="glow-primary" />
+              <TooltipProvider delayDuration={200}>
+                <div className="relative">
+                  {/* Main avatar - rotating celebrity */}
+                  <div className="animate-float">
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div className="cursor-pointer">
+                          <AvatarPreview email={CELEBRITY_EMAILS[demoIndex].email} size={280} className="glow-primary" />
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom" className="bg-card border-border">
+                        <p className="font-semibold">{CELEBRITY_EMAILS[demoIndex].name}</p>
+                        <p className="text-xs text-muted-foreground font-mono">{CELEBRITY_EMAILS[demoIndex].email}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
+                  
+                  {/* Floating smaller avatars - other celebrities */}
+                  <motion.div
+                    className="absolute -top-8 -left-12"
+                    animate={{ y: [0, -10, 0] }}
+                    transition={{ duration: 4, repeat: Infinity, delay: 0.5 }}
+                  >
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div className="cursor-pointer">
+                          <AvatarPreview email="tcook@apple.com" size={80} />
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent className="bg-card border-border">
+                        <p className="font-semibold">Tim Cook</p>
+                        <p className="text-xs text-muted-foreground font-mono">tcook@apple.com</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </motion.div>
+                  <motion.div
+                    className="absolute -bottom-4 -right-16"
+                    animate={{ y: [0, -8, 0] }}
+                    transition={{ duration: 3.5, repeat: Infinity, delay: 1 }}
+                  >
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div className="cursor-pointer">
+                          <AvatarPreview email="zuck@fb.com" size={100} />
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent className="bg-card border-border">
+                        <p className="font-semibold">Mark Zuckerberg</p>
+                        <p className="text-xs text-muted-foreground font-mono">zuck@fb.com</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </motion.div>
+                  <motion.div
+                    className="absolute top-1/2 -right-20"
+                    animate={{ y: [0, -12, 0] }}
+                    transition={{ duration: 5, repeat: Infinity, delay: 0.2 }}
+                  >
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div className="cursor-pointer">
+                          <AvatarPreview email="sundar@google.com" size={60} />
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent className="bg-card border-border">
+                        <p className="font-semibold">Sundar Pichai</p>
+                        <p className="text-xs text-muted-foreground font-mono">sundar@google.com</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </motion.div>
                 </div>
-                
-                {/* Floating smaller avatars */}
-                <motion.div
-                  className="absolute -top-8 -left-12"
-                  animate={{ y: [0, -10, 0] }}
-                  transition={{ duration: 4, repeat: Infinity, delay: 0.5 }}
-                >
-                  <AvatarPreview email="hello@world.com" size={80} />
-                </motion.div>
-                <motion.div
-                  className="absolute -bottom-4 -right-16"
-                  animate={{ y: [0, -8, 0] }}
-                  transition={{ duration: 3.5, repeat: Infinity, delay: 1 }}
-                >
-                  <AvatarPreview email="test@demo.app" size={100} />
-                </motion.div>
-                <motion.div
-                  className="absolute top-1/2 -right-20"
-                  animate={{ y: [0, -12, 0] }}
-                  transition={{ duration: 5, repeat: Infinity, delay: 0.2 }}
-                >
-                  <AvatarPreview email="user@example.io" size={60} />
-                </motion.div>
-              </div>
+              </TooltipProvider>
             </motion.div>
           </div>
         </div>
