@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { AvatarPreview } from "@/components/AvatarPreview";
 import { CharacterBreakdown } from "@/components/CharacterBreakdown";
 import { CodeExample } from "@/components/CodeExample";
+import { CavatarLogo } from "@/components/CavatarLogo";
 import { generateAvatarDataURL, generateAvatarSVG, BackgroundType, AvatarShape, isValidEmail } from "@/lib/avatarGenerator";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
@@ -140,7 +141,7 @@ with open('avatar.png', 'wb') as f:
               </div>
               
               <h1 className="text-5xl lg:text-6xl font-bold font-display leading-tight">
-                Generate <span className="gradient-text">Unique Avatars</span> from Email
+                <span className="gradient-text">Cave Art Avatars</span> from Email
               </h1>
               
               <p className="text-xl text-muted-foreground leading-relaxed max-w-lg">
@@ -588,12 +589,9 @@ with open('avatar.png', 'wb') as f:
       <footer className="py-12 border-t border-border">
         <div className="container">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-secondary" />
-              <span className="font-display font-bold text-lg">AvatarGen</span>
-            </div>
+            <CavatarLogo size={32} />
             <p className="text-sm text-muted-foreground">
-              Generate unique, deterministic avatars from any email address
+              Cave art inspired avatars, unique to every email
             </p>
           </div>
         </div>

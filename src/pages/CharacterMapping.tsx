@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { ArrowLeft, CheckCircle, AlertTriangle, Sparkles, Fingerprint, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ShapeIcon } from "@/components/ShapeIcon";
+import { CavatarLogo } from "@/components/CavatarLogo";
 import { CHARACTER_SHAPE_MAP, verifyUniqueShapes, ShapeDefinition } from "@/lib/characterShapes";
 
 const CharacterMapping = () => {
@@ -248,7 +249,8 @@ const CharacterMapping = () => {
 
       {/* Footer */}
       <footer className="py-8 border-t border-border">
-        <div className="container text-center">
+        <div className="container flex flex-col items-center gap-4">
+          <CavatarLogo size={32} />
           <Link to="/">
             <Button variant="hero">
               Try the Generator
