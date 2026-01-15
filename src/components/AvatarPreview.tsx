@@ -1,27 +1,28 @@
 import { useEffect, useState } from "react";
-import { generateAvatarDataURL, BackgroundType } from "@/lib/avatarGenerator";
+import { generateAvatarDataURL, BackgroundType, AvatarShape } from "@/lib/avatarGenerator";
 
 interface AvatarPreviewProps {
   email: string;
   size?: number;
   className?: string;
   background?: BackgroundType;
+  shape?: AvatarShape;
 }
 
-export const AvatarPreview = ({ email, size = 256, className = "", background = 'cosmos' }: AvatarPreviewProps) => {
+export const AvatarPreview = ({ email, size = 256, className = "", background = 'cosmos', shape = 'rounded' }: AvatarPreviewProps) => {
   const [avatarUrl, setAvatarUrl] = useState<string>("");
   
   useEffect(() => {
     if (email) {
-      const url = generateAvatarDataURL(email, size, background);
+      const url = generateAvatarDataURL(email, size, background, shape);
       setAvatarUrl(url);
     }
-  }, [email, size, background]);
+  }, [email, size, background, shape]);
   
   if (!email || !avatarUrl) {
     return (
       <div 
-        className={`bg-muted rounded-xl flex items-center justify-center ${className}`}
+        className={`bg-muted flex items-center justify-center ${shape === 'circle' ? 'rounded-full' : 'rounded-xl'} ${className}`}
         style={{ width: size, height: size }}
       >
         <span className="text-muted-foreground text-sm">Enter email</span>
@@ -33,7 +34,7 @@ export const AvatarPreview = ({ email, size = 256, className = "", background = 
     <img 
       src={avatarUrl} 
       alt={`Avatar for ${email}`}
-      className={`rounded-xl shadow-avatar ${className}`}
+      className={`${shape === 'circle' ? 'rounded-full' : 'rounded-xl'} shadow-avatar ${className}`}
       style={{ width: size, height: size }}
     />
   );
