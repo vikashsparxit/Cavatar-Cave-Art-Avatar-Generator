@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Mail, Download, Copy, Check, Sparkles, Code2, Zap, Palette, AlertCircle, FileImage, FileCode } from "lucide-react";
+import { Mail, Download, Copy, Check, Sparkles, Code2, Zap, Palette, AlertCircle, FileImage, FileCode, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AvatarPreview } from "@/components/AvatarPreview";
 import { CharacterBreakdown } from "@/components/CharacterBreakdown";
@@ -377,6 +378,14 @@ with open('avatar.png', 'wb') as f:
 
                 {/* Character breakdown */}
                 {isEmailValid && <CharacterBreakdown email={email} />}
+                
+                {/* Link to full mapping */}
+                <Link to="/character-mapping" className="block">
+                  <Button variant="outline" className="w-full gap-2">
+                    <BookOpen className="w-4 h-4" />
+                    View Full Character Mapping
+                  </Button>
+                </Link>
               </motion.div>
 
               {/* Avatar preview */}
