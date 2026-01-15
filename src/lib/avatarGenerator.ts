@@ -481,7 +481,7 @@ export function generateAvatarCanvas(email: string, size: number = 256, backgrou
     ctx.fillRect(0, 0, size, size);
   }
   
-  // Draw first letter silhouette (filled + outlined for visibility at small sizes)
+  // Draw first letter silhouette with crosshatch pattern (blueprint aesthetic)
   const firstLetter = getFirstLetter(email);
   if (firstLetter) {
     ctx.save();
@@ -491,15 +491,68 @@ export function generateAvatarCanvas(email: string, size: number = 256, backgrou
     const textX = size / 2;
     const textY = size / 2 + size * 0.02;
     
-    // Fill the letter with cave color (visible at small sizes)
-    ctx.globalAlpha = 0.12;
+    // Fill the letter with cave color (base visibility)
+    ctx.globalAlpha = 0.10;
     ctx.fillStyle = lineColor;
     ctx.fillText(firstLetter, textX, textY);
     
-    // Stroke/border for definition
-    ctx.globalAlpha = 0.08;
+    // Create clipping path from the letter shape
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(0, 0, size, size);
+    ctx.clip();
+    
+    // Use the letter as a clipping mask for crosshatch
+    ctx.beginPath();
+    ctx.font = `bold ${size * 0.85}px Arial, sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    
+    // Create text path for clipping (using fill to define the region)
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = size;
+    tempCanvas.height = size;
+    const tempCtx = tempCanvas.getContext('2d')!;
+    tempCtx.font = `bold ${size * 0.85}px Arial, sans-serif`;
+    tempCtx.textAlign = 'center';
+    tempCtx.textBaseline = 'middle';
+    tempCtx.fillStyle = 'black';
+    tempCtx.fillText(firstLetter, textX, textY);
+    
+    // Draw diagonal crosshatch lines clipped to letter shape
+    ctx.globalAlpha = 0.15;
     ctx.strokeStyle = lineColor;
-    ctx.lineWidth = size * 0.008;
+    ctx.lineWidth = Math.max(1, size * 0.006);
+    
+    const lineSpacing = Math.max(4, size * 0.035);
+    const diagonal = size * 1.5;
+    
+    // Draw lines and use composite operation to clip to letter
+    ctx.globalCompositeOperation = 'source-atop';
+    
+    // Diagonal lines from top-left to bottom-right
+    for (let i = -diagonal; i < diagonal; i += lineSpacing) {
+      ctx.beginPath();
+      ctx.moveTo(i, 0);
+      ctx.lineTo(i + size, size);
+      ctx.stroke();
+    }
+    
+    // Diagonal lines from top-right to bottom-left
+    for (let i = -diagonal; i < diagonal; i += lineSpacing) {
+      ctx.beginPath();
+      ctx.moveTo(size - i, 0);
+      ctx.lineTo(-i, size);
+      ctx.stroke();
+    }
+    
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.restore();
+    
+    // Stroke/border for definition
+    ctx.globalAlpha = 0.12;
+    ctx.strokeStyle = lineColor;
+    ctx.lineWidth = size * 0.012;
     ctx.strokeText(firstLetter, textX, textY);
     ctx.restore();
   }
@@ -570,13 +623,39 @@ export function generateAvatarSVG(email: string, size: number = 256, background:
     bgRect = `<rect width="${size}" height="${size}" fill="${background}"/>`;
   }
   
-  // Add first letter silhouette (filled + outlined for visibility at small sizes)
+  // Add first letter silhouette with crosshatch pattern (blueprint aesthetic)
   const firstLetter = getFirstLetter(email);
   if (firstLetter) {
-    // Filled letter for visibility at small sizes
-    shapes += `<text x="${size / 2}" y="${size / 2}" dy="0.35em" font-family="Arial, sans-serif" font-size="${size * 0.85}" font-weight="bold" fill="${lineColor}" opacity="0.12" text-anchor="middle">${firstLetter}</text>`;
+    const lineSpacing = Math.max(4, size * 0.035);
+    const clipId = `letterClip-${Math.random().toString(36).substr(2, 9)}`;
+    
+    // Define clip path for the letter
+    bgDefs += `
+      <clipPath id="${clipId}">
+        <text x="${size / 2}" y="${size / 2}" dy="0.35em" font-family="Arial, sans-serif" font-size="${size * 0.85}" font-weight="bold" text-anchor="middle">${firstLetter}</text>
+      </clipPath>`;
+    
+    // Base fill for visibility
+    shapes += `<text x="${size / 2}" y="${size / 2}" dy="0.35em" font-family="Arial, sans-serif" font-size="${size * 0.85}" font-weight="bold" fill="${lineColor}" opacity="0.10" text-anchor="middle">${firstLetter}</text>`;
+    
+    // Crosshatch pattern clipped to letter shape
+    let crosshatchLines = '';
+    const diagonal = size * 1.5;
+    
+    // Diagonal lines from top-left to bottom-right
+    for (let i = -diagonal; i < diagonal; i += lineSpacing) {
+      crosshatchLines += `<line x1="${i}" y1="0" x2="${i + size}" y2="${size}" stroke="${lineColor}" stroke-width="${Math.max(1, size * 0.006)}" stroke-linecap="round"/>`;
+    }
+    
+    // Diagonal lines from top-right to bottom-left
+    for (let i = -diagonal; i < diagonal; i += lineSpacing) {
+      crosshatchLines += `<line x1="${size - i}" y1="0" x2="${-i}" y2="${size}" stroke="${lineColor}" stroke-width="${Math.max(1, size * 0.006)}" stroke-linecap="round"/>`;
+    }
+    
+    shapes += `<g clip-path="url(#${clipId})" opacity="0.15">${crosshatchLines}</g>`;
+    
     // Stroked border for definition
-    shapes += `<text x="${size / 2}" y="${size / 2}" dy="0.35em" font-family="Arial, sans-serif" font-size="${size * 0.85}" font-weight="bold" fill="none" stroke="${lineColor}" stroke-width="${size * 0.008}" opacity="0.08" text-anchor="middle">${firstLetter}</text>`;
+    shapes += `<text x="${size / 2}" y="${size / 2}" dy="0.35em" font-family="Arial, sans-serif" font-size="${size * 0.85}" font-weight="bold" fill="none" stroke="${lineColor}" stroke-width="${size * 0.012}" opacity="0.12" text-anchor="middle">${firstLetter}</text>`;
   }
   
   // Generate layers and convert to SVG
