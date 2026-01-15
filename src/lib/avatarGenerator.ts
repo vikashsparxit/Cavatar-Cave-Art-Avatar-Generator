@@ -2,6 +2,7 @@
 
 export type BackgroundType = 'cosmos' | 'white' | string;
 export type AvatarShape = 'rounded' | 'circle';
+export type ImageFormat = 'png' | 'webp' | 'jpeg';
 
 // Extract first alphabetic character from email for silhouette
 function getFirstLetter(email: string): string {
@@ -580,9 +581,17 @@ export function generateAvatarCanvas(email: string, size: number = 256, backgrou
   return canvas;
 }
 
-export function generateAvatarDataURL(email: string, size: number = 256, background: BackgroundType = 'cosmos', shape: AvatarShape = 'rounded'): string {
+export function generateAvatarDataURL(
+  email: string, 
+  size: number = 256, 
+  background: BackgroundType = 'cosmos', 
+  shape: AvatarShape = 'rounded',
+  format: ImageFormat = 'png',
+  quality: number = 0.92
+): string {
   const canvas = generateAvatarCanvas(email, size, background, shape);
-  return canvas.toDataURL('image/png');
+  const mimeType = format === 'webp' ? 'image/webp' : format === 'jpeg' ? 'image/jpeg' : 'image/png';
+  return canvas.toDataURL(mimeType, quality);
 }
 
 export function generateAvatarSVG(email: string, size: number = 256, background: BackgroundType = 'cosmos', shape: AvatarShape = 'rounded'): string {

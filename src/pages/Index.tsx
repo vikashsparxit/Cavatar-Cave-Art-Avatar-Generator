@@ -63,9 +63,21 @@ const Index = () => {
       setEmailError("Please enter a valid email address");
       return;
     }
-    const dataUrl = generateAvatarDataURL(email, selectedSize, getBackground(), selectedShape);
+    const dataUrl = generateAvatarDataURL(email, selectedSize, getBackground(), selectedShape, 'png');
     const link = document.createElement("a");
     link.download = `avatar-${email.split("@")[0]}-${selectedSize}px.png`;
+    link.href = dataUrl;
+    link.click();
+  };
+
+  const handleDownloadWEBP = () => {
+    if (!isValidEmail(email)) {
+      setEmailError("Please enter a valid email address");
+      return;
+    }
+    const dataUrl = generateAvatarDataURL(email, selectedSize, getBackground(), selectedShape, 'webp', 0.9);
+    const link = document.createElement("a");
+    link.download = `avatar-${email.split("@")[0]}-${selectedSize}px.webp`;
     link.href = dataUrl;
     link.click();
   };
@@ -432,10 +444,10 @@ with open('avatar.png', 'wb') as f:
                 </div>
 
                 {/* Action buttons */}
-                <div className="flex gap-3">
+                <div className="flex flex-wrap gap-2">
                   <Button 
                     variant="glow" 
-                    className="flex-1" 
+                    className="flex-1 min-w-[70px]" 
                     onClick={handleDownloadPNG}
                     disabled={!isEmailValid}
                   >
@@ -444,7 +456,16 @@ with open('avatar.png', 'wb') as f:
                   </Button>
                   <Button 
                     variant="glow" 
-                    className="flex-1" 
+                    className="flex-1 min-w-[70px]" 
+                    onClick={handleDownloadWEBP}
+                    disabled={!isEmailValid}
+                  >
+                    <FileImage className="w-4 h-4" />
+                    WEBP
+                  </Button>
+                  <Button 
+                    variant="glow" 
+                    className="flex-1 min-w-[70px]" 
                     onClick={handleDownloadSVG}
                     disabled={!isEmailValid}
                   >
