@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { ArrowLeft, CheckCircle, AlertTriangle } from "lucide-react";
+import { ArrowLeft, CheckCircle, AlertTriangle, Sparkles, Fingerprint, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ShapeIcon } from "@/components/ShapeIcon";
 import { CHARACTER_SHAPE_MAP, verifyUniqueShapes, ShapeDefinition } from "@/lib/characterShapes";
@@ -90,6 +90,89 @@ const CharacterMapping = () => {
               </div>
             )}
           </div>
+
+          {/* Inspiration Section */}
+          <section className="mb-16 p-8 lg:p-12 bg-gradient-to-br from-primary/5 via-card to-secondary/5 rounded-3xl border border-border">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="max-w-4xl mx-auto"
+            >
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 rounded-2xl bg-primary/20 flex items-center justify-center">
+                  <Sparkles className="w-6 h-6 text-primary" />
+                </div>
+                <h2 className="text-2xl lg:text-3xl font-bold font-display">The Inspiration</h2>
+              </div>
+              
+              <div className="space-y-6 text-muted-foreground leading-relaxed">
+                <p className="text-lg">
+                  <span className="text-foreground font-semibold">Cave art</span> represents humanity's earliest 
+                  form of visual communication—simple yet profound marks that have endured for over 40,000 years. 
+                  From the spirals of Newgrange to the handprints of Lascaux, our ancestors used basic geometric 
+                  shapes to express identity, tell stories, and leave their mark on the world.
+                </p>
+                
+                <p>
+                  We drew inspiration from this timeless art form to create something meaningful for the digital age. 
+                  The <span className="text-foreground font-medium">concentric circles</span>, <span className="text-foreground font-medium">spirals</span>, 
+                  <span className="text-foreground font-medium"> triangles</span>, and <span className="text-foreground font-medium">wavy lines</span> in 
+                  our avatars echo the petroglyphic symbols found in ancient caves across every continent—universal 
+                  shapes that transcend language and culture.
+                </p>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-6 mt-10">
+                <div className="p-6 bg-background/50 rounded-2xl border border-border">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 rounded-xl bg-destructive/20 flex items-center justify-center">
+                      <span className="text-destructive text-xl">😐</span>
+                    </div>
+                    <h3 className="text-lg font-semibold text-foreground">Traditional Avatars</h3>
+                  </div>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    Most avatar generators today are <span className="text-foreground">predictable and boring</span>—simple 
+                    initials on colored circles, generic geometric patterns, or random abstract shapes with no 
+                    personal meaning. They feel corporate, impersonal, and forgettable. You've seen the same 
+                    "JD" on a blue circle a thousand times.
+                  </p>
+                </div>
+                
+                <div className="p-6 bg-background/50 rounded-2xl border border-border">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center">
+                      <Fingerprint className="w-5 h-5 text-primary" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-foreground">Our Approach</h3>
+                  </div>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    Every character in your email becomes a <span className="text-foreground">unique visual element</span>. 
+                    The result is an avatar that's distinctly yours—like a digital fingerprint rendered in 
+                    ancient symbolism. It's art that tells your story, not just a placeholder image.
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-10 p-6 bg-primary/10 rounded-2xl border border-primary/20">
+                <div className="flex items-start gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center shrink-0">
+                    <Globe className="w-5 h-5 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-foreground mb-2">One Avatar, Everywhere</h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      Because your avatar is generated deterministically from your email, it's 
+                      <span className="text-foreground font-medium"> always yours</span>—across every platform, 
+                      every app, every website. No uploads, no accounts, no syncing. Just consistent identity 
+                      that follows you throughout the internet. The same email will always produce the exact 
+                      same beautiful, unique avatar.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </section>
 
           {/* Letters Section */}
           <section className="mb-12">
