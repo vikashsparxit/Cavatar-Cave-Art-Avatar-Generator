@@ -493,6 +493,33 @@ with open('avatar.png', 'wb') as f:
                     {email || "your-email@example.com"}
                   </p>
                 </div>
+                
+                {/* Size preview row */}
+                {isEmailValid && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="w-full pt-4 border-t border-border"
+                  >
+                    <p className="text-xs text-muted-foreground uppercase tracking-wider mb-3 text-center">
+                      Size Preview
+                    </p>
+                    <div className="flex items-end justify-center gap-4">
+                      <div className="flex flex-col items-center gap-1">
+                        <AvatarPreview email={email} size={128} background={getBackground()} shape={selectedShape} />
+                        <span className="text-xs text-muted-foreground">128px</span>
+                      </div>
+                      <div className="flex flex-col items-center gap-1">
+                        <AvatarPreview email={email} size={64} background={getBackground()} shape={selectedShape} />
+                        <span className="text-xs text-muted-foreground">64px</span>
+                      </div>
+                      <div className="flex flex-col items-center gap-1">
+                        <AvatarPreview email={email} size={32} background={getBackground()} shape={selectedShape} />
+                        <span className="text-xs text-muted-foreground">32px</span>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
               </motion.div>
             </div>
           </div>
