@@ -23,8 +23,8 @@
 
 ```bash
 # Clone the repository
-git clone https://github.com/vikashsparxit/email-pixels.git
-cd email-pixels
+git clone https://github.com/vikashsparxit/cavatar.git
+cd cavatar
 
 # Install dependencies
 npm install
@@ -140,9 +140,9 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 🔗 Links
 
-- [Live Demo](https://email-pixels.lovable.app)
+- [Live Demo](https://cavatar.lovable.app)
 - [Character Mapping Reference](/character-mapping)
-- [Report Issues](https://github.com/vikashsparxit/email-pixels/issues)
+- [Report Issues](https://github.com/vikashsparxit/cavatar/issues)
 
 ---
 
