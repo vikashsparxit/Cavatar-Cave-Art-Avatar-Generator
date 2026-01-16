@@ -32,7 +32,7 @@ const Index = () => {
   const [bgOption, setBgOption] = useState<BackgroundOption>('cosmos');
   const [customColor, setCustomColor] = useState('#6366f1');
   const [selectedSize, setSelectedSize] = useState<SizeOption>(256);
-  const [selectedShape, setSelectedShape] = useState<AvatarShape>('rounded');
+  const [selectedShape, setSelectedShape] = useState<AvatarShape>('circle');
   const [emailError, setEmailError] = useState<string | null>(null);
 
   // Validate email when it changes
