@@ -140,12 +140,5 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 🔗 Links
 
-- [Live Demo](https://cavatar.lovable.app)
 - [Character Mapping Reference](/character-mapping)
 - [Report Issues](https://github.com/vikashsparxit/cavatar/issues)
-
----
-
-<p align="center">
-  Made with ❤️ using <a href="https://lovable.dev">Lovable</a>
-</p>
