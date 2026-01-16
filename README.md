@@ -5,6 +5,16 @@
   <img src="https://img.shields.io/badge/TypeScript-5.0-3178C6?logo=typescript" alt="TypeScript" />
   <img src="https://img.shields.io/badge/Tailwind-3.4-06B6D4?logo=tailwindcss" alt="Tailwind" />
   <img src="https://img.shields.io/badge/Vite-5.0-646CFF?logo=vite" alt="Vite" />
+  <img src="https://img.shields.io/badge/License-MIT-green.svg" alt="License: MIT" />
+</p>
+
+<p align="center">
+  <a href="#-features">Features</a> •
+  <a href="#-quick-start">Quick Start</a> •
+  <a href="#-usage">Usage</a> •
+  <a href="#-roadmap">Roadmap</a> •
+  <a href="#-contributing">Contributing</a> •
+  <a href="#-support">Support</a>
 </p>
 
 **Connect to your roots.** Generate unique, deterministic cave art avatars from any email address. Each character maps to primitive petroglyphic shapes—spirals, concentric circles, triangles, and ancient symbols.
@@ -83,6 +93,33 @@ Each character in the email address maps to a unique cave art element:
 | @ | Concentric | Special email symbol marker |
 | . | Dots | Domain separator dots |
 
+## 🗺️ Roadmap
+
+We're actively developing Cavatar! Here's what's coming:
+
+### Phase 1: Core Package ✅
+- [x] Deterministic avatar generation
+- [x] Multiple export formats (PNG, WEBP, SVG)
+- [x] Shape variants (circle, rounded, triangle)
+- [x] Background customization
+
+### Phase 2: Distribution 🚧
+- [ ] **NPM Package** - `npm install cavatar`
+- [ ] **REST API** - Simple API endpoints for avatar generation
+- [ ] **CDN Distribution** - Direct script include for any website
+
+### Phase 3: Cultural Themes 🎨
+- [ ] **Egyptian Theme** - Hieroglyphic-inspired symbols
+- [ ] **Celtic Theme** - Knots, spirals, and interlacing patterns
+- [ ] **Nordic Theme** - Runes and Viking-age motifs
+- [ ] **Aboriginal Theme** - Dot painting inspired patterns
+
+### Phase 4: Integrations 🔌
+- [ ] **Browser Extension** - Generate avatars anywhere
+- [ ] **Gravatar Alternative** - Drop-in replacement service
+- [ ] **WordPress Plugin** - Easy integration for WP sites
+- [ ] **Discord Bot** - Generate avatars in chat
+
 ## 🏗️ Project Structure
 
 ```
@@ -124,13 +161,19 @@ Modify `src/lib/avatarGenerator.ts` to customize:
 - Background gradients
 - Crosshatch pattern density
 
-## 📄 License
-
-MIT License - feel free to use in personal and commercial projects.
-
 ## 🤝 Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+We love contributions! Cavatar is open-source and community-driven.
+
+### Ways to Contribute
+
+- 🐛 **Report Bugs** - Found an issue? [Open a bug report](https://github.com/vikashsparxit/cavatar/issues/new?template=bug_report.md)
+- 💡 **Suggest Features** - Have an idea? [Submit a feature request](https://github.com/vikashsparxit/cavatar/issues/new?template=feature_request.md)
+- 🎨 **Design** - Help create new cultural shape themes
+- 📖 **Documentation** - Improve docs and examples
+- 💻 **Code** - Fix bugs or implement new features
+
+### Getting Started
 
 1. Fork the repository
 2. Create your feature branch (`git checkout -b feature/amazing-feature`)
@@ -138,7 +181,37 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
+Please read our [Contributing Guide](CONTRIBUTING.md) and [Code of Conduct](CODE_OF_CONDUCT.md) before contributing.
+
+## 💖 Support
+
+If you find Cavatar useful, consider supporting its development:
+
+<p align="center">
+  <a href="https://github.com/sponsors/vikashsparxit">
+    <img src="https://img.shields.io/badge/Sponsor-GitHub-ea4aaa?logo=github" alt="GitHub Sponsors" />
+  </a>
+  <a href="https://buymeacoffee.com/vikashshinr">
+    <img src="https://img.shields.io/badge/Buy%20Me%20a%20Coffee-FFDD00?logo=buymeacoffee&logoColor=black" alt="Buy Me a Coffee" />
+  </a>
+</p>
+
+Your support helps maintain the project, develop new features, and keep Cavatar free and open-source!
+
+## 📄 License
+
+This project is licensed under the [MIT License](LICENSE) - feel free to use in personal and commercial projects.
+
 ## 🔗 Links
 
+- [Live Demo](https://cavatar.lovable.app)
 - [Character Mapping Reference](/character-mapping)
 - [Report Issues](https://github.com/vikashsparxit/cavatar/issues)
+- [Contributing Guide](CONTRIBUTING.md)
+- [Code of Conduct](CODE_OF_CONDUCT.md)
+
+---
+
+<p align="center">
+  Made with ❤️ by <a href="https://github.com/vikashsparxit">Vikash</a> and the Cavatar community
+</p>
