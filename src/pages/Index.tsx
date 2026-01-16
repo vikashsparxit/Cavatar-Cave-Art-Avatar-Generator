@@ -367,7 +367,7 @@ with open('avatar.png', 'wb') as f:
                     </button>
                   </div>
                   
-                  {/* Custom hex input */}
+                  {/* Custom color picker and hex input */}
                   {bgOption === 'custom' && (
                     <motion.div
                       initial={{ opacity: 0, height: 0 }}
@@ -375,10 +375,18 @@ with open('avatar.png', 'wb') as f:
                       exit={{ opacity: 0, height: 0 }}
                       className="flex gap-2 items-center"
                     >
-                      <div 
-                        className="w-10 h-10 rounded-lg border border-border shrink-0"
-                        style={{ backgroundColor: customColor }}
-                      />
+                      <div className="relative w-10 h-10 shrink-0">
+                        <input
+                          type="color"
+                          value={customColor}
+                          onChange={(e) => setCustomColor(e.target.value)}
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                        />
+                        <div 
+                          className="w-10 h-10 rounded-lg border border-border cursor-pointer hover:ring-2 hover:ring-primary/50 transition-all"
+                          style={{ backgroundColor: customColor }}
+                        />
+                      </div>
                       <input
                         type="text"
                         value={customColor}
