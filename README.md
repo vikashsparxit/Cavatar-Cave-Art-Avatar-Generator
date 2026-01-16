@@ -191,7 +191,7 @@ If you find Cavatar useful, consider supporting its development:
   <a href="https://github.com/sponsors/vikashsparxit">
     <img src="https://img.shields.io/badge/Sponsor-GitHub-ea4aaa?logo=github" alt="GitHub Sponsors" />
   </a>
-  <a href="https://buymeacoffee.com/vikashshinr">
+  <a href="https://buymeacoffee.com/vikashsparxit">
     <img src="https://img.shields.io/badge/Buy%20Me%20a%20Coffee-FFDD00?logo=buymeacoffee&logoColor=black" alt="Buy Me a Coffee" />
   </a>
 </p>
